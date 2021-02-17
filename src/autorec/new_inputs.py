@@ -111,7 +111,28 @@ def get_params():
     mc_gain = input("Name of gain file? (Default: gain.mrc) ")
     if len(mc_gain) == 0:
         mc_gain = 'gain.mrc'
-    
+
+    # Set dictionary to be returned
+    question_dict = {
+        "ba_set_prefix2look4": prefix_find,
+        "ba_set_prefix2add": prefix_add,
+        "ba_path_raw": path_raw,
+        "ad_path_motioncor": mcor,
+        "ad_path_stacks": stacks,
+        "ad_path_mdocfiles": mdocfiles,
+        "ba_run_motioncor": run_mcor,
+        "ba_run_ctffind": run_ctffind,
+        "ba_run_stack": run_stack,
+        "ba_run_batchruntomo": run_batchruntomo,
+        "ba_run_onthefly": run_otf,
+        "ad_run_overwrite": run_overwrite,
+        "ba_mc_motioncor": mc_motioncor,
+        "ba_ctf_ctffind": ctf_ctffind,
+        "ad_mc_throw": mc_throw,
+        "ba_mc_tif": mc_tif,
+        "ba_mc_gain": mc_gain,
+        }
+        
     return (prefix_find, prefix_add, path_raw, mcor, stacks, mdocs,
             run_mcor, run_ctffind, run_stack, run_batchruntomo, run_otf,
             run_overwrite, mc_motioncor, ctf_ctffind,
