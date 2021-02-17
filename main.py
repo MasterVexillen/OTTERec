@@ -91,9 +91,6 @@ def run(timestamp_in=None):
     """
     if timestamp_in is None or len(timestamp_in)==0:
         timestamp_in = get_today_timestamp()
-
-    # Final hard check for prerequisite files
-    check(hard_check=True)
     
     # Check validity of input file with given timestamp
     inputs_name = 'Toolbox_inputs_{}.txt'.format(timestamp_in)
@@ -120,12 +117,13 @@ def main():
         new()
 
     elif task == 'run':
+        check(hard_check=True)
         input_timestamp = input('Use input from which date? (Please enter exactly as formatted in file name.) ')
         run(input_timestamp)
 
     elif task == 'all':
-        check()
         new()
+        check(hard_check=True)
         run()
 
 if __name__ == '__main__':
