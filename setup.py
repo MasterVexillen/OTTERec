@@ -1,7 +1,7 @@
 """
-Copyright (C) 2021 Neville Bor-yior Yee
+Copyright (C) 2021 Rosalind Franklin Institute
 
-This code is distributed under the MIT license
+This code is distributed under the ApacheV2 license
 """
 from skbuild import setup
 

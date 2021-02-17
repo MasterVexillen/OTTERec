@@ -1,6 +1,8 @@
 """
 main.py
 
+Copyright (C) 2021 Rosalind Franklin Institute
+
 Author: Neville B.-y. Yee
 Date: 16-Feb-2021
 

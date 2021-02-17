@@ -11,6 +11,9 @@ A program to automate cryoET image reconstruction under DLS workflow
 
 ### Procedures
 1. Git clone git repo
+```
+git clone https://github.com/MasterVexillen/autorec.git
+```
 
 2. Create virtual environment in miniconda
 ```
