@@ -8,6 +8,7 @@ Version: 0.1
 """
 
 import os
+import re
 
 def get_params():
     """
@@ -133,7 +134,35 @@ def get_params():
         "ba_mc_gain": mc_gain,
         }
         
-    return (prefix_find, prefix_add, path_raw, mcor, stacks, mdocs,
-            run_mcor, run_ctffind, run_stack, run_batchruntomo, run_otf,
-            run_overwrite, mc_motioncor, ctf_ctffind,
-            mc_throw, mc_tif, mc_gain)
+    return question_dict
+
+
+def change_file_params(file_in, qdict_in):
+    """
+    Change parameters in input file according to user's preferences
+    """
+
+    # Check file is valid
+    assert(os.path.isfile(file_in)), \
+        "Error in new_inputs.change_params: File not found."
+
+    # Check user dictionary is valid
+    assert(isinstance(qdict_in, dict) and \
+           len(qdict_in) > 0), \
+           "Error in new_inputs.change_params: Input dictionary not valid or empty."
+
+    # Read file
+    with open(file_in, 'r') as f:
+        source = f.readlines()
+
+    # Overwrite parameters
+    with open(file_in, 'w') as f:
+        for line in source:
+            for key in qdict_in:
+                pattern = r'({}=)\S*'.format(key)
+                if match := re.match(pattern, line):
+                    f.write(match.group(1) + str(qdict_in[key]) + '\n')
+                    break
+            else:
+                f.write(line)
+                f.truncate()
