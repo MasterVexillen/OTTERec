@@ -27,18 +27,19 @@ def get_task():
         'check',
         'new',
         'run',
+        'all',
     ]
     assert (task in allowed_tasks), \
         "Error: input task not recognised. Aborting."
 
     return task
 
-def check():
+def check(hard_check=False):
     """
     Perform final check for essential files
     """
-    cs.check_raw()
-    cs.check_files()
+    cs.check_raw(hard_check)
+    cs.check_files(hard_check)
 
 def get_today_timestamp():
     """
@@ -88,8 +89,10 @@ def run(timestamp_in=None):
     """
     if timestamp_in is None or len(timestamp_in)==0:
         timestamp_in = get_today_timestamp()
-        print(timestamp_in)
 
+    # Final hard check for prerequisite files
+    check(hard_check=True)
+    
     # Check validity of input file with given timestamp
     inputs_name = 'Toolbox_inputs_{}.txt'.format(timestamp_in)
     assert (os.path.isfile(inputs_name)), \
@@ -117,7 +120,11 @@ def main():
     elif task == 'run':
         input_timestamp = input('Use input from which date? (Please enter exactly as formatted in file name.) ')
         run(input_timestamp)
-        
+
+    elif task == 'all':
+        check()
+        new()
+        run()
 
 if __name__ == '__main__':
     main()

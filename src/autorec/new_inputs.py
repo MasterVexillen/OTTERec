@@ -144,6 +144,7 @@ def get_params():
         "ba_set_prefix2add": prefix_add,
         "ba_set_field_nb": stack_field,
         "ba_set_field_tilt": tilt_field,
+        "ba_mc_jobs_per_gpu": jobs_per_gpu,
         "ba_set_pixelsize": px_size,
         "ba_path_raw": path_raw,
         "ad_path_motioncor": mcor,
