@@ -23,6 +23,30 @@ def get_params():
     if len(prefix_add) == 0:
         prefix_add = prefix_find
 
+    stack_field_in = input("Field # for stack numbers? (Default: 1) ")
+    if len(stack_field_in) == 0:
+        stack_field = 1
+    else:
+        stack_field = int(stack_field_in)
+
+    tilt_field_in = input("Field # for tilt angles? (Default: 3) ")
+    if len(tilt_field_in) == 0:
+        tilt_field = 3
+    else:
+        tilt_field = int(tilt_field_in)
+
+    px_size = input("Pixel size of raw images? (Default: header) ")
+    if len(px_size) == 0:
+        px_size = 'header'
+    else:
+        px_size = float(px_size)
+
+    jobs_per_gpu = input("Jobs per GPU? (Default: 1) ")
+    if len(jobs_per_gpu) == 0:
+        jobs_per_gpu = 1
+    else:
+        jobs_per_gpu = int(jobs_per_gpu)
+
     path_raw = input("Path to raw images? (Default: ../raw/{}_*) ".format(prefix_find))
     if len(path_raw) == 0:
         path_raw =  '../raw/' + prefix_find + '_*'
@@ -87,9 +111,9 @@ def get_params():
     else:
         raise ValueError("Invalid input for run_overwrite.")
 
-    mc_motioncor = input("Path to Motioncor2? (Default: /opt/modules/motiorn2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_cuda110) ")
+    mc_motioncor = input("Path to Motioncor2? (Default: /opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110) ")
     if len(mc_motioncor) == 0:
-        mc_motioncor = '/opt/modules/motiorn2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_cuda110)'
+        mc_motioncor = '/opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110'
 
     ctf_ctffind = input("Path to CTFFind? (Default: /opt/modules/ctffind/4.1.14/bin/ctffind) ")
     if len(ctf_ctffind) == 0:
@@ -113,14 +137,18 @@ def get_params():
     if len(mc_gain) == 0:
         mc_gain = 'gain.mrc'
 
+
     # Set dictionary to be returned
     question_dict = {
         "ba_set_prefix2look4": prefix_find,
         "ba_set_prefix2add": prefix_add,
+        "ba_set_field_nb": stack_field,
+        "ba_set_field_tilt": tilt_field,
+        "ba_set_pixelsize": px_size,
         "ba_path_raw": path_raw,
         "ad_path_motioncor": mcor,
         "ad_path_stacks": stacks,
-        "ad_path_mdocfiles": mdocfiles,
+        "ad_path_mdocfiles": mdocs,
         "ba_run_motioncor": run_mcor,
         "ba_run_ctffind": run_ctffind,
         "ba_run_stack": run_stack,
