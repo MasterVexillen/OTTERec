@@ -1,7 +1,7 @@
 # autorec
-A program suite to automate cryoET image reconstruction under DLS workflow
+A program to automate cryoET image reconstruction under DLS workflow
 
-## Installations
+## Installation
 
 ### Prerequisites
 - Python >= 3.8
