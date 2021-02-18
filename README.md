@@ -3,23 +3,16 @@ A program to automate cryoET image reconstruction under DLS workflow
 
 ## Installation
 
-### Prerequisites
-- Python >= 3.8
-- scikit-build
-- pandas
-- miniconda
-
-### Procedures
-1. Git clone git repo
+1. Git clone repo
 ```
 git clone https://github.com/MasterVexillen/autorec.git
 ```
 
-2. Create virtual environment in miniconda
+2. Create virtual environment in miniconda and pre-install packages
 ```
 conda create -n autorec-env
 conda activate autorec-env
-conda install python scikit-build pandas
+conda install --file requirements.txt
 ```
 
 3. Build autorec
