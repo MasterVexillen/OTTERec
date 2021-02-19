@@ -18,8 +18,9 @@ conda install --file requirements.txt
 
 3. Build autorec
 ```
-python setup.py install
+python setup.py develop
 ```
+
 
 ## Running autorec
 1. Activate autorec environment: `conda activate autorec-env`
