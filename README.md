@@ -21,12 +21,17 @@ conda install --file requirements.txt
 python setup.py develop
 ```
 
-
 ## Running autorec
-1. Activate autorec environment: `conda activate autorec-env`
-2. Load imod: `module load imod`
-3. Run autorec: `python ${AUTOREC_PATH}/main.py *task*`, where *task* can be:
-   * `check`: Performs a soft check (just warnings, no hard exit) on prequisite files and folder structure.
+1. Activate autorec environment and load imod
+```
+conda activate autorec-env
+module load imod
+```
+2. Run autorec
+```
+autorec.TASK
+```
+where `TASK` can be:
+   * `check`: Performs check on prequisite files and folder structure.
    * `new`: Prepares and flips gain reference files, prepares new input parameter file, then modifies the parameters according to user preferences.
    * `run`: Performs a hard check on prerequisite files and folder structure, then runs preprocessing using a user-specified parameter file.
-   * `all`: Prepares new parameter file and run preprocessing using the **new** file.

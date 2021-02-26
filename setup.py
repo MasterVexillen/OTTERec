@@ -14,6 +14,13 @@ def main():
         package_dir={"": "src"},
         packages=["autorec"],
         install_requires=[],
+        entry_points={
+            "console_scripts": [
+                "autorec.check=autorec.main:check",
+                "autorec.new=autorec.main:new",
+                "autorec.run=autorec.main:run",
+            ]
+        }
     )
 
 if __name__ == '__main__':

@@ -18,28 +18,18 @@ import autorec.check_struct as cs
 import autorec.new_inputs as ni
 
 
-def get_task():
-    """
-    Get task from user
-    """
-    
-    task = sys.argv[1].lower()
-
-    allowed_tasks = [
-        'check',
-        'new',
-        'run',
-        'all',
-    ]
-    assert (task in allowed_tasks), \
-        "Error: input task not recognised. Aborting."
-
-    return task
-
-def check(hard_check=False):
+def check():
     """
     Perform final check for essential files
     """
+    hard_check = input('Perform hard check? ([y]/n) ').lower()
+    if len(hard_check)==0 or hard_check == 'y':
+        hard_check = True
+    elif hard_check == 'n':
+        hard_check = False
+    else:
+        raise ValueError('Error in check: Invalid input.')
+        
     cs.check_raw(hard_check)
     cs.check_files(hard_check)
 
@@ -85,10 +75,14 @@ def new():
         qdict_in=user_params_dict,
     )
 
-def run(timestamp_in=None):
+def run():
     """
     Run toolbox_tomoDLS.py
     """
+    # Perform hard check first
+    check()
+
+    timestamp_in = input('Use input from which date? (Please enter exactly as formatted in file name.) ')
     if timestamp_in is None or len(timestamp_in)==0:
         timestamp_in = get_today_timestamp()
     
@@ -101,30 +95,3 @@ def run(timestamp_in=None):
     run_command = 'python toolbox_tomoDLS.py -i {}'.format(inputs_name)
     os.system(run_command)
 
-    
-
-def main():
-    """
-    Main interface of autorec
-    """
-    task = get_task()
-
-    if task == 'check':
-        check()
-
-    elif task == 'new':
-        check()
-        new()
-
-    elif task == 'run':
-        check(hard_check=True)
-        input_timestamp = input('Use input from which date? (Please enter exactly as formatted in file name.) ')
-        run(input_timestamp)
-
-    elif task == 'all':
-        new()
-        check(hard_check=True)
-        run()
-
-if __name__ == '__main__':
-    main()
