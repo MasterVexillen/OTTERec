@@ -47,7 +47,7 @@ def generate_yaml(filename):
             'MotionCor2_path': './motioncor/',
 	    'stacks_path': './stacks/',
 	    'mdocs_path': './mdocs/',
-	    'logfile_name': './toolbox_{}.log'.format(dt.datetime.now().strftime("%d%b%Y").upper()),
+	    'logfile_name': './toolbox_{}.log'.format(dt.datetime.now().strftime("%d%b%Y")),
 	    'Output_prefix': '*',
         },
 
