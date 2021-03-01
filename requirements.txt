@@ -1,3 +1,5 @@
 python
 scikit-build
 pandas
+pyyaml
+multiprocess
