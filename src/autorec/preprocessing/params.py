@@ -7,6 +7,7 @@ Author: Neville B.-y. Yee
 Date: 01-Mar-2021
 """
 
+import os
 import yaml
 import multiprocess as mp
 import datetime as dt
@@ -21,7 +22,7 @@ class Params:
         """
         Initialising a Param object
         """
-        self.data = param_in
+        self.params = param_in
 
 
 def generate_yaml(filename):
@@ -110,5 +111,27 @@ def generate_yaml(filename):
     with open(filename, 'w') as f:
         yaml.dump(default_config, f, indent=4, sort_keys=False)
 
+
+def read_yaml(filename):
+    """
+    Read in a YAML config file
+
+    Args:
+        filename (str): name of YAML file to be read
+
+    Returns:
+        Params object
+    """
+    if not os.path.isfile(filename):
+        raise IOError("Error in preprocessing.params.read_yaml: File not found.")
+
+    with open(filename, 'r') as f:
+        params = yaml.load(f, Loader=yaml.FullLoader)
+
+    return Params(params)
+
+
+
 if __name__ == '__main__':
-    generate_yaml('test.yaml')
+    params = read_yaml('test.yaml')
+    print(params.params['Inputs']['Source_path'])
