@@ -129,9 +129,3 @@ def read_yaml(filename):
         params = yaml.load(f, Loader=yaml.FullLoader)
 
     return Params(params)
-
-
-
-if __name__ == '__main__':
-    params = read_yaml('test.yaml')
-    print(params.params['Inputs']['Source_path'])
