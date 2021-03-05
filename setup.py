@@ -19,11 +19,10 @@ def main():
                 "autorec.check=autorec.main:check",
                 "autorec.new=autorec.main:new",
                 "autorec.run=autorec.main:run",
+                "autorec.lookup=autorec.preprocessing.params:params_lookup",
             ]
         }
     )
 
 if __name__ == '__main__':
     main()
-
-            

@@ -1,0 +1,62 @@
+old_params,new_params_group,new_params,data_type,default_value,description
+ba_set_prefix2loo4,Inputs,source_prefix,str,*,"Look for the movies/sums with this prefix. If '*', catch every mrc/tif image. 
+NB: This is used even if MotionCor is deactivated."
+ba_set_prefix2add,Outputs,output_prefix,str,WT,"Prefix to add to every output (motion corrected images, stacks, logs, etc.). 
+NB: prefix/suffix from the original images are removed"
+ba_set_field_nb,Inputs,stack_field,int,1,"Field (sep: '_', counting from 0) containing stack number in the filename of raw images. 
+If you do not want to run MotionCor, this must correspond to the motion corrected images. Only numbers will 
+be kept, allowing to have tilt<nb>"
+ba_set_field_tilt,Inputs,tilt_angle_field,int,3,"Field (sep: '_', counting from 0) containing tilt angle in the filename of raw images. 
+If you do not want to run MotionCor, this must correspond to the motion corrected images"
+ba_set_pixelsize,Inputs,pixel_size,float | 'header',header,"Pixel size of the raw images in Angstrom. If 'header', the pixel size is read from the header"
+ad_set_max_cpus,Run,max_cpu,int,{multiprocessing.cpu_count()},Number of processes used in parallel for creating and aligning the tilt-series.
+ba_path_raw,Inputs,source_path,str,../raw/,"Path of the raw images directory. Only used if MotionCor2 is activated. The path can end with
+'*', meaning that the movies are grouped into sub-folders (i.e. raw/stack*)"
+ad_path_motioncor,Outputs,MotionCor2_path,str,motioncor,Where the MotionCor outputs will go. Will be created if doesn't exist.
+ad_path_stacks,Outputs,stacks_path,str,stacks,Path of stacks and Ctffind outputs. Will be created if doesn't exist
+ad_path_mdocfiles,Outputs,mdocs_path,str,mdocs,"Path of mdoc files. Used to create the rawtlt file. File names must be (path)/*_<stack_nb>.mrc.mdoc with 'stack_nb' being the stack number (zeros padded, 3 characters)"
+ad_path_logfile,Outputs,logfile_name,str,toolbox_{datetime.now():%d%b%Y}.log,"Main log file name. Other log files (MotionCor2, Ctftinf, etc.) will be saved independently"
+ba_run_motioncor,MotionCor,run_MotionCor2,bool,true,"Run MotionCor2 or not. If not, the motion corrected images must be in path_motioncor and the ba_set settings must correspond to these images"
+ba_run_ctffind,CTFFind,run_ctffind,bool,true,Estimate the defocus of the lower tilt image of each stack using Ctffind
+ba_run_stack,Run,create_stack,bool,true,Create the stack from motion-corrected sums
+ba_run_batchruntomo,BatchRunTomo,align_images_brt,bool,true,Align the tilt-series using IMOD batchruntomo
+ba_run_onthefly,Run,run_otf,bool,false,Triggers on-the-fly processing
+ad_run_overwrite,Run,run_rewrite,bool,false,"Will re-process every stack. If 0, will look at a file (toolbox_stack_processed.txt) and skip the stacks that are registered inside this file (<nb>:<nb>:). The stack numbers can be padded with 0"
+ad_run_nb,Run,process_stacks_list,int | list,all,Process only these/this stack(s). Must correspond to the stack number at the field ba_set_field_nb (+/- 0 padding). This is ignored when on-the-fly is activated. Default: Process everything
+ba_otf_max_images_per_stack,On-the-fly,max_image,int,37,Expected number of images per stacks. Used to catch the last stack
+ba_otf_max_time2try,On-the-fly,timeout,float,20,Tolerated time (min) of inactivity
+ba_mc_motioncor,MotionCor,MotionCor2_path,str,/opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110,Path of MotionCor2 program
+ba_mc_desired_pixelsize,MotionCor,desired_pixel_size,float | 'current' | 'ps_x2',ps_x2,"Desired pixel size. If lower than current pixel size, Fourier cropping will be done by MotionCor2. If 'current': no Ftbin applied, If 'ps_x2': Ftbin=2"
+ad_mc_throw,MotionCor,discard_frames_top,int,0,"Frame to remove, from the first frame. From 0"
+ad_mc_trunc,MotionCor,discard_frames_bottom,int,1,"Frame to remove, from the last frame. From 0"
+ad_mc_tolerance,MotionCor,tolerance,float,0.5,Tolerance of alignment accuracy: less than X pixel
+ad_mc_iter,MotionCor,max_iterations,int,10,Iterations after which the alignment stops (if tolerance not achieved already)
+ad_mc_patch,MotionCor,patch_size,"list (int, int [, int])","[5, 5, 20]","After global alignment, divides the corrected frames into X*X patches on which the local motion is measured"
+ad_mc_group,MotionCor,use_subgroups,int,true,"Equally divide the input stack into non-overlapping sub-groups. Instead of aligning individual frames, the sums of these sub-groups are aligned. The shifts of individual frames are then interpolated and extrapolated. Recommended for low-signal movie stacks"
+ba_mc_gpu,MotionCor,use_gpu,int | 'auto',auto,"GPU IDs. Can be a list of int separated by comas (ex: 0,1,2,3) or 'auto'. These must correspond to the ID displayed using nvidia-smi. If 'auto', the program will select the visible GPUs that do not have any process running"
+ba_mc_jobs_per_gpu,MotionCor,jobs_per_gpu,int,3,Number of MotionCor jobs per GPU. I recommend to try with one stack to see how much memory is allocated
+ad_mc_gpu_mem_usage,MotionCor,gpu_memory_usage,float,0.5,"GPU memory allocated to buffer the movie stacks. For multiple MotionCor2 jobs in one GPU, it is recommended to set it to 0."
+ba_mc_tif,Inputs,source_tiffs,bool,false,If the raw images are in TIF
+ba_mc_gain,Inputs,gain_reference_file,str,nogain,Gain reference for MotionCor2. Must have the corrected rotation and be a mrc file
+ba_ctf_ctffind,CTFFind,CTFfind_path,str,/opt/modules/ctffind/4.1.14/bin/ctffind,Path of Ctffind
+ad_ctf_voltage,CTFFind,voltage,float,300,Acceleration voltage (kV)
+ad_ctf_cs,CTFFind,spherical_abberation,float,2.7,Spherical aberration (mm)
+ad_ctf_amp_cont,CTFFind,amp_contrast,float,0.8,Amplitude contrast (0 to 1)
+ad_ctf_size2compute,CTFFind,amp_spec_size,int,512,Size of amplitude spectrum to compute
+ad_ctf_min_res,CTFFind,resolution_min,float,30,Minimum resolution
+ad_ctf_max_res,CTFFind,resolution_max,float,5,Maximum resolution
+ad_ctf_min_def,CTFFind,defocus_min,float,5000,Minimum defocus
+ad_ctf_max_def,CTFFind,defocus_max,float,50000,Maximum defocus
+ad_ctf_step_def,CTFFind,defocus_step,float,500,Defocus search step
+ad_ctf_astig_type,CTFFind,Astigm_type,str | None,None,Do you know what astigmatism is present?
+ad_ctf_exhaustive,CTFFind,exhaustive_search,bool,false,"Slower, more exhaustive search"
+ad_ctf_astig_restraint,CTFFind,astigm_restraint,bool,false,Use a restraint on astigmatism
+ad_ctf_phase_shift,CTFFind,phase_shift,bool,0,Find additional phase shift
+ad_brt_adoc,BatchRunTomo,adoc_file,str,default,Batchruntomo adoc file to use. Overwrites every ba_brt parameters except ad_brt_start and ad_brt_end
+ba_brt_gold_size,BatchRunTomo,bead_size,float,10,Size of gold beads in nm
+ba_brt_rotation_angle,BatchRunTomo,init_rotation_angle,float,86,Initial angle of rotation in the plane of projection. This is the CCW positive rotation from the vertical axis to the suspected tilt axis in the unaligned views
+ad_brt_bin_coarse,BatchRunTomo,coarse_align_bin_size,int | 'auto',auto,"Bin used for coarsed alignment. If 'auto', set the binning to have the gold beads diameter to ~12.5 pixel"
+ad_brt_target_nb_beads,BatchRunTomo,target_num_beads,int,25,(Generous) Target number of beads per projection. Usually 25 is fine
+ad_brt_bin_ali,BatchRunTomo,final_bin,int,5,Binning used for final stack and tomogram reconstruction
+ad_brt_start,BatchRunTomo,step_start,int,0,Starts at this step. See batchruntomo documentation.
+ad_brt_end,BatchRunTomo,step_end,int,20,Ends at this step. 12: stop after gold erase. 20: stop after tomogram generation and rotation

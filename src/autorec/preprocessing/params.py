@@ -8,7 +8,10 @@ Date: 01-Mar-2021
 """
 
 import os
+import sys
 import yaml
+from glob import glob
+import pandas as pd
 import multiprocess as mp
 import datetime as dt
 
@@ -33,78 +36,80 @@ def generate_yaml(filename):
         filename (str): name of output YAML file
     """
     default_config = {
-        'Inputs': {
-	    'Source_path': '../raw/',
-	    'Source_prefix': '*',
-	    'Stack_field': 1,
-	    'Tilt_angle_field': 3,
-	    'Pixel_size': 'header',
-	    'Source_tiffs': False,
-	    'Gain_reference_file': 'nogain',
+        'inputs': {
+	    'source_path': '../raw/',
+	    'source_prefix': '*',
+	    'stack_field': 1,
+	    'tilt_angle_field': 3,
+	    'pixel_size': 'header',
+	    'source_tiffs': False,
+	    'gain_reference_file': 'nogain',
         },
 
-        'Outputs': {
+        'outputs': {
             'MotionCor2_path': './motioncor/',
 	    'stacks_path': './stacks/',
 	    'mdocs_path': './mdocs/',
 	    'logfile_name': './toolbox_{}.log'.format(dt.datetime.now().strftime("%d%b%Y")),
-	    'Output_prefix': '*',
+	    'output_prefix': '*',
         },
 
-	'Run': {
-            'Max_cpu': mp.cpu_count(),
-            'Create_stack': True,
-            'Run_rewrite': True,
+	'run': {
+            'max_cpu': mp.cpu_count(),
+            'create_stack': True,
+            'process_stacks_list': 'all',
+            'rewrite': True,
         },
 
-        'On-the-fly': {
-            'Run_otf': False,
-            'Max image': 37,
-            'Timeout': 20,
+        'on-the-fly': {
+            'run_otf': False,
+            'max_image': 37,
+            'timeout': 20,
         },
 
         'MotionCor': {
-            'Run_MotionCor2': True,
+            'run_MotionCor2': True,
             'MotionCor2_path': '/opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110',
-            'Desired_pixel_size': 'ps_x2',
-            'Discard_frames_top': 0,
-            'Discard_frames_bottom': 1,
-            'Tolerance': 0.5,
-            'Max_iterations': 10,
-            'Patches': [5, 5, 20],
-            'Use_subgroups': True,
-            'Use_gpu': 'auto',
-            'Jobs_per_gpu': 3,
+            'desired_pixel_size': 'ps_x2',
+            'discard_frames_top': 0,
+            'discard_frames_bottom': 1,
+            'tolerance': 0.5,
+            'max_iterations': 10,
+            'patch_size': [5, 5, 20],
+            'use_subgroups': True,
+            'use_gpu': 'auto',
+            'jobs_per_gpu': 3,
             'gpu_memory_usage': 0.5,
         },
 
         'CTFFind': {
-            'Run_ctffind': True,
+            'run_ctffind': True,
             'CTFfind_path': '/opt/modules/ctffind/4.1.14/bin/ctffind',
-            'Voltage': 300.,
-            'Spherical_aberration': 2.7,
-            'Amp_contrast': 0.8,
-            'Amp_spec_size': 512,
-            'Min_resolution': 30.,
-            'Max_resolution': 5.,
-            'Min_defocus': 5000.,
-            'Max_defocus': 50000.,
-            'Astigm_type': None,
-            'Exhaustive_search': False,
-            'Astigm_restraint': False,
-            'Phase_shift': 0.,
+            'voltage': 300.,
+            'spherical_aberration': 2.7,
+            'amp_contrast': 0.8,
+            'amp_spec_size': 512,
+            'resolution_min': 30.,
+            'resolution_max': 5.,
+            'defocus_min': 5000.,
+            'defocus_max': 50000.,
+            'defocus_step': 500.,
+            'astigm_type': None,
+            'exhaustive_search': False,
+            'astigm_restraint': False,
+            'phase_shift': 0.,
         },
 
         'BatchRunTomo': {
-            'Align_images_brt': True,
+            'align_images_brt': True,
             'adoc_file': 'default',
-            'Bead_size': 10.,
-            'Init_rotation_angle': 86.,
-            'Coarse_align_bin_size': 'auto',
-            'Target_num_beads': 25,
-            'Final_bin': 5,
-            'Start_step': 0,
-            'End_step': 20,
+            'bead_size': 10.,
+            'init_rotation_angle': 86.,
+            'coarse_align_bin_size': 'auto',
+            'target_num_beads': 25,
+            'final_bin': 5,
+            'step_start': 0,
+            'step_end': 20,
         }
     }
 
@@ -129,3 +134,64 @@ def read_yaml(filename):
         params = yaml.load(f, Loader=yaml.FullLoader)
 
     return Params(params)
+
+
+def params_lookup():
+    """
+    Subroutine to search for parameters and prints out info
+    """
+
+    assert len(sys.argv)==2, \
+        "Invalid input. USAGE: autorec.lookup parameter"
+
+    user_param = sys.argv[1]
+
+    curr_dir = os.path.dirname(os.path.abspath(__file__))
+    params_list = pd.read_csv(curr_dir+"/data/params_list.csv")
+
+    # Initial check if input parameter is valid
+    if '.' in user_param:
+        lookup_key = user_param.split(sep='.')
+        # Check format
+        if len(lookup_key) != 2:
+            raise ValueError("Error in params_lookup: Wrong format of input parameter.")
+        # Check validity of input parameters
+        lookup_group, lookup_name = lookup_key
+        params_list['group_lower'] = params_list['new_params_group'].map(lambda x: x.lower())
+        params_list['name_lower'] = params_list['new_params'].map(lambda x: x.lower())
+        if lookup_group.lower() not in params_list['group_lower'].unique() or \
+           lookup_name.lower() not in params_list['name_lower'].unique():
+            raise ValueError("Group or name of parameter not found.")
+        # Now parameter is validated
+        param_is_new = True
+
+    else:
+        # Assume parameter is in old format
+        lookup_key = user_param
+        if lookup_key.lower() not in params_list['old_params'].unique():
+            raise ValueError("Parameter not found.")
+        param_is_new = False
+
+    # Lookup data
+    if not param_is_new:
+        old_param = user_param
+        data_row = params_list[params_list['old_params']==old_param]
+        new_param_group = data_row.new_params_group.item()
+        new_param_name = data_row.new_params.item()
+        data_type = data_row.data_type.item()
+        description = data_row.description.item()
+    else:
+        data_row = params_list[(params_list['group_lower']==lookup_group.lower()) &
+                               (params_list['name_lower']==lookup_name.lower())]
+
+    # Print out information
+    print("\nNew parameter in YAML (format: GROUP.NAME):")
+    print(f"{data_row['new_params_group'].values[0]}.{data_row['new_params'].values[0]} \n")
+    print("Old parameter:")
+    print(f"{data_row['old_params'].values[0]} \n")
+    print("Description:")
+    print(f"{data_row['description'].values[0]} \n")
+    print("Data type(s):")
+    print(f"{data_row['data_type'].values[0]} \n")
+    print("Default value: ")
+    print(f"{data_row['default_value'].values[0]}\n")
