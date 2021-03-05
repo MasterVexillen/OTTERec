@@ -27,6 +27,11 @@ class Params:
         """
         self.params = param_in
 
+        self.hidden_oft_gpu = None  # see Metadata._get_gpu_id
+        self.hidden_mc_ftbin = None  # see self.set_pixelsize
+        self.hidden_queue_filename = 'toolbox_stack_processed.txt'
+        self.hidden_run_nb = None  # just for warning, remember positive restriction
+
 
 def generate_yaml(filename):
     """
