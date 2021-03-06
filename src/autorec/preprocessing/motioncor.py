@@ -17,7 +17,7 @@ class MotionCor:
     Class encapsulating a MotionCor object
     """
 
-    def __init__(self, params_in, meta_tilt, stack):
+    def __init__(self, params_in, meta_tilt, stack, loggerObj):
         """
         Initialise a MotionCor object
 
@@ -25,12 +25,14 @@ class MotionCor:
         params_in (Params): input parameters (Params object)
         meta_tilt (df): subset of the metadata. Describe one tilt-series.
         stack (int): tilt series number
+        loggerObj (Logger): a Logger object for logging process
         """
 
         self.pObj = params_in
         self.params = self.pObj.params
         self.meta_tilt = meta_tilt
         self.stack = stack
+        self.logger = loggerObj
 
         self.log = list()
         self.stack_padded = f'{self.stack:03}'
@@ -43,15 +45,15 @@ class MotionCor:
         # gives a Cufft2D error. So rerun missing images if any, but this time one per GPU.
         self.meta_tilt = self._check_motioncor_output()
         if len(self.meta_tilt) > 0:
-            logger(f"\nMotionCor WARNING:\n"
-                   f"{TAB}{len(self.meta_tilt)} images failed. It may be because no memory was available "
-                   f"on the device. You may stop the program and decrease MotionCor.jobs_per_gpu.\n"
-                   f"{TAB}Reprocessing the missing images one at a time... ", nl=True)
+            self.logger(f"\nMotionCor WARNING:\n"
+                        f"{TAB}{len(self.meta_tilt)} images failed. It may be because no memory was available "
+                        f"on the device. You may stop the program and decrease MotionCor.jobs_per_gpu.\n"
+                        f"{TAB}Reprocessing the missing images one at a time... ", nl=True)
             self._run_motioncor()
 
         # save output
         self._save2logfile()
-        logger(f'MotionCor2: stack{self.stack_padded} processed.', stdout=False)
+        self.logger(f'MotionCor2: stack{self.stack_padded} processed.', stdout=False)
 
     def _run_motioncor(self):
         """
