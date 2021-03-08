@@ -100,6 +100,19 @@ def new_revamp():
     """
     Generate YAML config file
     """
+    # Prepare gain reference
+    for curr_file in os.listdir('.'):
+        if fnmatch.fnmatch(curr_file, '*.dm4'):
+            dm4_default = curr_file.strip('.dm4')
+            break
+    dm4_name = input('Name of the .dm4 file (less .dm4)? (Default: {}) '\
+                     .format(dm4_default))
+    if len(dm4_name) == 0:
+        dm4_name = dm4_default
+    dm2mrc_command = 'dm2mrc {}.dm4 gain_unflip.mrc'.format(dm4_name)
+    os.system(dm2mrc_command)
+    os.system('clip flipx gain_unflip.mrc gain.mrc')
+
     if len(sys.argv) != 2:
         raise ValueError("Error in input length. USAGE: autorec.new filename")
 
