@@ -29,10 +29,11 @@ module load imod
 ```
 2. Run autorec
 ```
-autorec.TASK [param]
+autorec.TASK [option]
 ```
 where `TASK` can be:
-   * `lookup`: Prints out essential information about a given parameter. *param* can be in the old format or new `GROUP.NAME` format, but must be present.
+   * `lookup`: Prints out essential information about a given parameter. *option* is the parameter in the old format or new `GROUP.NAME` format, but must be present.
    * `check`: Performs check on prequisite files and folder structure.
    * `new`: Prepares and flips gain reference files, prepares new input parameter file, then modifies the parameters according to user preferences.
+   * `validate`: Validates a given YAML configuration file. *option* is the name of the YAML file to be validated.
    * `run`: Performs a hard check on prerequisite files and folder structure, then runs preprocessing using a user-specified parameter file.

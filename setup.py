@@ -17,8 +17,9 @@ def main():
         entry_points={
             "console_scripts": [
                 "autorec.check=autorec.main:check",
-                "autorec.new=autorec.main:new",
                 "autorec.run=autorec.main:run",
+                "autorec.new=autorec.main:new_revamp",
+                "autorec.validate=autorec.main:validate_revamp",
                 "autorec.lookup=autorec.preprocessing.params:params_lookup",
             ]
         }

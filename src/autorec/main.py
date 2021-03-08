@@ -16,6 +16,7 @@ import datetime as dt
 
 import autorec.check_struct as cs
 import autorec.new_inputs as ni
+import autorec.preprocessing.params as params
 
 
 def check():
@@ -29,7 +30,7 @@ def check():
         hard_check = False
     else:
         raise ValueError('Error in check: Invalid input.')
-        
+
     cs.check_raw(hard_check)
     cs.check_files(hard_check)
 
@@ -41,7 +42,7 @@ def get_today_timestamp():
     stamp = today.strftime("%d") + today.strftime("%b") + today.strftime("%Y")
 
     return stamp
-    
+
 def new():
     """
     Create new input file
@@ -65,7 +66,7 @@ def new():
 
     timestamp = get_today_timestamp()
     inputs_name = 'Toolbox_inputs_{}.txt'.format(timestamp)
-        
+
     # Prompt user to answer questions for changing input parameters
     user_params_dict = ni.get_params()
 
@@ -85,7 +86,7 @@ def run():
     timestamp_in = input('Use input from which date? (Please enter exactly as formatted in file name.) ')
     if timestamp_in is None or len(timestamp_in)==0:
         timestamp_in = get_today_timestamp()
-    
+
     # Check validity of input file with given timestamp
     inputs_name = 'Toolbox_inputs_{}.txt'.format(timestamp_in)
     assert (os.path.isfile(inputs_name)), \
@@ -95,3 +96,24 @@ def run():
     run_command = 'python toolbox_tomoDLS.py -i {}'.format(inputs_name)
     os.system(run_command)
 
+def new_revamp():
+    """
+    Generate YAML config file
+    """
+    if len(sys.argv) != 2:
+        raise ValueError("Error in input length. USAGE: autorec.new filename")
+
+    yaml_name = sys.argv[1]
+    params.generate_yaml(yaml_name)
+
+def validate_revamp():
+    """
+    Validate YAML config file
+    """
+    if len(sys.argv) != 2:
+        raise ValueError("Error in input length. USAGE: autorec.validate filename")
+
+    yaml_name = sys.argv[1]
+    yaml_params = params.read_yaml(yaml_name)
+    yaml_params.validate()
+    print("Input YAML config file validated. All parameters are of the correct data types.")

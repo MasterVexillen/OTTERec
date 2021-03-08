@@ -32,6 +32,148 @@ class Params:
         self.hidden_queue_filename = 'toolbox_stack_processed.txt'
         self.hidden_run_nb = None  # just for warning, remember positive restriction
 
+    def validate(self):
+        """
+        Validate parameters
+        """
+        # define groups for ease of reading
+        inputs_group = self.params['inputs']
+        outputs_group = self.params['outputs']
+        run_group = self.params['run']
+        otf_group = self.params['on-the-fly']
+        mc_group = self.params['MotionCor']
+        ctf_group = self.params['CTFFind']
+        brt_group = self.params['BatchRunTomo']
+
+        # default types dictionary
+        inputs_types = {
+            'source_path': str,
+	    'source_prefix': str,
+	    'stack_field': int,
+	    'tilt_angle_field': int,
+	    'pixel_size': (int, float, str), # 'header' only if str
+	    'source_tiffs': bool,
+	    'gain_reference_file': str,
+        }
+
+        outputs_types = {
+            'MotionCor2_path': str,
+	    'stacks_path': str,
+	    'mdocs_path': str,
+	    'logfile_name': str,
+	    'output_prefix': str,
+        }
+
+        run_types = {
+            'max_cpu': int,
+            'create_stack': bool,
+            'process_stacks_list': (int, list, str), # 'all' only if str
+            'rewrite': bool,
+        }
+
+        otf_types = {
+            'run_otf': bool,
+            'max_image': int,
+            'timeout': (int, float)
+        }
+
+        mc_types = {
+            'run_MotionCor2': bool,
+            'MotionCor2_path': str,
+            'desired_pixel_size': (int, float, str), # 'current' or 'ps_x2' if str
+            'discard_frames_top': int,
+            'discard_frames_bottom': int,
+            'tolerance': (int, float),
+            'max_iterations': int,
+            'patch_size': list, # need check len==2 or 3
+            'use_subgroups': bool,
+            'use_gpu': (int, str), # 'auto' only if str
+            'jobs_per_gpu': int,
+            'gpu_memory_usage': (int, float),
+        }
+
+        ctf_types = {
+            'run_ctffind': bool,
+            'CTFfind_path': str,
+            'voltage': (int, float),
+            'spherical_aberration': (int, float),
+            'amp_contrast': (int, float),
+            'amp_spec_size': (int, float),
+            'resolution_min': (int, float),
+            'resolution_max': (int, float),
+            'defocus_min': (int, float),
+            'defocus_max': (int, float),
+            'defocus_step': (int, float),
+            'astigm_type': (str, type(None)),
+            'exhaustive_search': bool,
+            'astigm_restraint': bool,
+            'phase_shift': (int, float)
+        }
+
+        brt_types = {
+            'align_images_brt': bool,
+            'adoc_file': str,
+            'bead_size': (int, float),
+            'init_rotation_angle': (int, float),
+            'coarse_align_bin_size': (int, str), # 'auto' only if str
+            'target_num_beads': int,
+            'final_bin': int,
+            'step_start': int,
+            'step_end': int,
+        }
+
+        # Initial quick type check
+        # Inputs group
+        for param in inputs_types:
+            if not isinstance(inputs_group[param], inputs_types[param]):
+                raise TypeError(f"inputs.{param} is given as a {type(inputs_group[param])}, but it should be a {inputs_types[param]}.")
+        # Outputs group
+        for param in outputs_types:
+            if not isinstance(outputs_group[param], outputs_types[param]):
+                raise TypeError(f"outputs.{param} is given as a {type(outputs_group[param])}, but it should be a {outputs_types[param]}.")
+        # Run group
+        for param in run_types:
+            if not isinstance(run_group[param], run_types[param]):
+                raise TypeError(f"run.{param} is given as a {type(run_group[param])}, but it should be a {run_types[param]}.")
+        # OTF group
+        for param in otf_types:
+            if not isinstance(otf_group[param], otf_types[param]):
+                raise TypeError(f"otf.{param} is given as a {type(otf_group[param])}, but it should be a {otf_types[param]}.")
+        # MC group
+        for param in mc_types:
+            if not isinstance(mc_group[param], mc_types[param]):
+                raise TypeError(f"mc.{param} is given as a {type(mc_group[param])}, but it should be a {mc_types[param]}.")
+        # CTF group
+        for param in ctf_types:
+            if not isinstance(ctf_group[param], ctf_types[param]):
+                raise TypeError(f"ctf.{param} is given as a {type(ctf_group[param])}, but it should be a {ctf_types[param]}.")
+        # BRT group
+        for param in brt_types:
+            if not isinstance(brt_group[param], brt_types[param]):
+                raise TypeError(f"brt.{param} is given as a {type(brt_group[param])}, but it should be a {brt_types[param]}.")
+
+        # Extra checks for special parameter values
+        if isinstance(inputs_group['pixel_size'], str) and \
+           inputs_group['pixel_size'] != 'header':
+            raise ValueError("inputs.pixel_size must be 'header' or a float.")
+        if isinstance(run_group['process_stacks_list'], str) and \
+           run_group['process_stacks_list'] != 'all':
+            raise ValueError("run.process_stacks_list must be an int, a list of ints, or 'all'.")
+        if isinstance(mc_group['desired_pixel_size'], str) and \
+           mc_group['desired_pixel_size'] not in ['current', 'ps_x2']:
+            raise ValueError("MotionCor.desired_pixel_size must be a float, 'current' or 'ps_x2'.")
+        if len(mc_group['patch_size']) != 2 and len(mc_group['patch_size']) != 3:
+            raise ValueError("MotionCor.patch_size must be a list of length 2 or 3.")
+        for dimension in mc_group['patch_size']:
+            if not isinstance(dimension, int):
+                raise TypeError("Elements of MotionCor.patch_size list must be ints.")
+        if isinstance(mc_group['use_gpu'], str) and \
+           mc_group['use_gpu'] != 'auto':
+            raise ValueError("MotionCor.use_gpu must be an int or 'auto'.")
+        if isinstance(brt_group['coarse_align_bin_size'], str) and \
+           brt_group['coarse_align_bin_size'] != 'auto':
+            raise ValueError("BatchRunTomo.coarse_align_bin_size must be an int or 'auto'.")
+
 
 def generate_yaml(filename):
     """
