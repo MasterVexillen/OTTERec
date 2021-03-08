@@ -37,10 +37,10 @@ class Params:
         Validate parameters
         """
         # define groups for ease of reading
-        inputs_group = self.params['inputs']
-        outputs_group = self.params['outputs']
-        run_group = self.params['run']
-        otf_group = self.params['on-the-fly']
+        inputs_group = self.params['Inputs']
+        outputs_group = self.params['Outputs']
+        run_group = self.params['Run']
+        otf_group = self.params['On-the-fly']
         mc_group = self.params['MotionCor']
         ctf_group = self.params['CTFFind']
         brt_group = self.params['BatchRunTomo']
@@ -183,7 +183,7 @@ def generate_yaml(filename):
         filename (str): name of output YAML file
     """
     default_config = {
-        'inputs': {
+        'Inputs': {
 	    'source_path': '../raw/',
 	    'source_prefix': '*',
 	    'stack_field': 1,
@@ -193,7 +193,7 @@ def generate_yaml(filename):
 	    'gain_reference_file': 'nogain',
         },
 
-        'outputs': {
+        'Outputs': {
             'MotionCor2_path': './motioncor/',
 	    'stacks_path': './stacks/',
 	    'mdocs_path': './mdocs/',
@@ -201,14 +201,14 @@ def generate_yaml(filename):
 	    'output_prefix': '*',
         },
 
-	'run': {
+	'Run': {
             'max_cpu': mp.cpu_count(),
             'create_stack': True,
             'process_stacks_list': 'all',
             'rewrite': True,
         },
 
-        'on-the-fly': {
+        'On-the-fly': {
             'run_otf': False,
             'max_image': 37,
             'timeout': 20,
