@@ -1,0 +1,63 @@
+Inputs:
+    Source_path: ../raw/
+    Source_prefix: '*'
+    Stack_field: 1
+    Tilt_angle_field: 3
+    Pixel_size: header
+    Source_tiffs: false
+    Gain_reference_file: nogain
+Outputs:
+    MotionCor2_path: ./motioncor/
+    stacks_path: ./stacks/
+    mdocs_path: ./mdocs/
+    logfile_name: ./toolbox_01MAR2021.log
+    Output_prefix: '*'
+Run:
+    Max_cpu: 8
+    Create_stack: true
+    Run_rewrite: true
+On-the-fly:
+    Run_otf: false
+    Max image: 37
+    Timeout: 20
+MotionCor:
+    Run_MotionCor2: true
+    MotionCor2_path: /opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110
+    Desired_pixel_size: ps_x2
+    Discard_frames_top: 0
+    Discard_frames_bottom: 1
+    Tolerance: 0.5
+    Max_iterations: 10
+    Patches:
+    - 5
+    - 5
+    - 20
+    Use_subgroups: true
+    Use_gpu: auto
+    Jobs_per_gpu: 3
+    gpu_memory_usage: 0.5
+CTFFind:
+    Run_ctffind: true
+    CTFfind_path: /opt/modules/ctffind/4.1.14/bin/ctffind
+    Voltage: 300.0
+    Spherical_aberration: 2.7
+    Amp_contrast: 0.8
+    Amp_spec_size: 512
+    Min_resolution: 30.0
+    Max_resolution: 5.0
+    Min_defocus: 5000.0
+    Max_defocus: 50000.0
+    Astigm_type: null
+    Exhaustive_search: false
+    Astigm_restraint: false
+    Phase_shift: 0.0
+BatchRunTomo:
+    Align_images_brt: true
+    adoc_file: default
+    Bead_size: 10.0
+    Init_rotation_angle: 86.0
+    Coarse_align_bin_size: auto
+    Target_num_beads: 25
+    Final_bin: 5
+    Start_step: 0
+    End_step: 20
