@@ -12,15 +12,15 @@ def main():
 
     setup(
         package_dir={"": "src"},
-        packages=["autorec"],
+        packages=["OTTERec"],
         install_requires=[],
         entry_points={
             "console_scripts": [
-                "autorec.check=autorec.main:check",
-                "autorec.run=autorec.main:run",
-                "autorec.new=autorec.main:new_revamp",
-                "autorec.validate=autorec.main:validate_revamp",
-                "autorec.lookup=autorec.preprocessing.params:params_lookup",
+                "OTTERec.check=OTTERec.main:check",
+                "OTTERec.run=OTTERec.main:run",
+                "OTTERec.new=OTTERec.main:new_revamp",
+                "OTTERec.validate=OTTERec.main:validate_revamp",
+                "OTTERec.lookup=OTTERec.preprocessing.params:params_lookup",
             ]
         }
     )
