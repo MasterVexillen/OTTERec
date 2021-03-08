@@ -74,7 +74,7 @@ class Stack:
 
         # run batchruntomo and send the logs to logger
         if self.params['BatchRunTomo']['align_images_brt']:
-            batchruntomo = Batchruntomo(inputs,
+            batchruntomo = Batchruntomo(self.pObj,
                                         self.filename_stack,
                                         self.path)
             self.log += batchruntomo.log

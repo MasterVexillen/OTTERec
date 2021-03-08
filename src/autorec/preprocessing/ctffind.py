@@ -65,7 +65,7 @@ class CTFfind:
 
         # send the logs back to main
         self._get_ctffind_log()
-        logger(self.log, nl=True)
+        self.logger(self.log, nl=True)
 
     def _get_ctffind(self, image):
         """
@@ -111,6 +111,6 @@ class CTFfind:
 
         for line in possible_lines:
             if any(item in line for item in look4):
-                self.logger += f'{TAB}{line}\n'
+                self.log += f'{TAB}{line}\n'
             else:
                 continue
