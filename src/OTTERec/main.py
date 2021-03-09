@@ -154,7 +154,7 @@ def run_revamp():
           f"New stack:    {yaml_params.params['Run']['create_stack']}\n"
           f"Batchruntomo: {yaml_params.params['BatchRunTomo']['align_images_brt']}\n")
 
-    if yaml_params.params['Run']['run_otf']:
+    if yaml_params.params['On-the-fly']['run_otf']:
         print(f"On-the-fly processing: (Tolerated inactivity: {yaml_params.params['On-the-fly']['timeout']}min).")
         run_otf = otf.OnTheFly(yaml_params)
         run_otf.run(yaml_params)

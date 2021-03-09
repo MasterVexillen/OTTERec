@@ -20,7 +20,7 @@ ba_run_motioncor,MotionCor,run_MotionCor2,bool,TRUE,"Run MotionCor2 or not. If n
 ba_run_ctffind,CTFFind,run_ctffind,bool,TRUE,Estimate the defocus of the lower tilt image of each stack using Ctffind
 ba_run_stack,Run,create_stack,bool,TRUE,Create the stack from motion-corrected sums
 ba_run_batchruntomo,BatchRunTomo,align_images_brt,bool,TRUE,Align the tilt-series using IMOD batchruntomo
-ba_run_onthefly,Run,run_otf,bool,FALSE,Triggers on-the-fly processing
+ba_run_onthefly,On-the-fly,run_otf,bool,FALSE,Triggers on-the-fly processing
 ad_run_overwrite,Run,run_rewrite,bool,FALSE,"Will re-process every stack. If 0, will look at a file (toolbox_stack_processed.txt) and skip the stacks that are registered inside this file (<nb>:<nb>:). The stack numbers can be padded with 0"
 ad_run_nb,Run,process_stacks_list,int | list,all,Process only these/this stack(s). Must correspond to the stack number at the field ba_set_field_nb (+/- 0 padding). This is ignored when on-the-fly is activated. Default: Process everything
 ba_otf_max_images_per_stack,On-the-fly,max_image,int,37,Expected number of images per stacks. Used to catch the last stack
