@@ -12,7 +12,7 @@ Disclaimer: Adopted and modified from toolbox_tomoDLS.py from Diamond repo
 from threading import Semaphore
 import multiprocess
 
-from OTTERec.preprocess.params import Params
+from OTTERec.preprocessing.params import Params
 
 
 class WorkerManager:

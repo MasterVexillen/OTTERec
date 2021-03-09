@@ -35,11 +35,11 @@ class Metadata:
         self.images_per_stack = None
 
         # Set path to raw files
-        if self.params['MotionCor']['Run_MotionCor2']:
-            self.path = self.params['Inputs']['Source_path']
+        if self.params['MotionCor']['run_MotionCor2']:
+            self.path = self.params['Inputs']['source_path']
             self.extension = 'tif'
         else:
-            self.path = self.params['Outputs']['MotionCor2_path']
+            self.path = self.params['Outputs']['motionCor2_path']
             self.extension = 'mrc'
 
     def get_metadata(self):
@@ -57,10 +57,9 @@ class Metadata:
         # set output file name and assign every image to one GPU
         if self.params['MotionCor']['run_MotionCor2']:
             meta['gpu'] = self._get_gpu_id()
+            output_str = f"{self.params['Outputs']['MotionCor2_path']}/{self.params['Outputs']['output_prefix']}_{row['nb']:03}_{row['tilt']}.mrc"
             meta['output'] = meta.apply(
-                lambda row: f"{self.params['Outputs']['MotionCor2_path']}/"
-                            f"{self.params['Outputs']['Output_prefix']}_{row['nb']:03}_{row['tilt']}.mrc",
-                axis=1)
+                lambda row: output_str, axis=1)
         else:
             meta['output'] = meta['raw']
 
@@ -74,7 +73,7 @@ class Metadata:
         pandas DataFrame
         """
         raw_files = glob('{}/{}*.{}'.format(self.path,
-                                            self.params['Inputs']['Source_prefix'],
+                                            self.params['Inputs']['source_prefix'],
                                             self.extension)
         )
         if len(raw_files) == 0:

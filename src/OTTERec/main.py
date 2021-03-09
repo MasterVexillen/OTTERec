@@ -19,6 +19,7 @@ import OTTERec.new_inputs as ni
 import OTTERec.preprocessing.params as params
 import OTTERec.preprocessing.logger as logger
 import OTTERec.preprocessing.otf as otf
+import OTTERec.preprocessing.preprocessing as pp
 
 
 def check():
@@ -159,4 +160,4 @@ def run_revamp():
         run_otf = otf.OnTheFly(yaml_params)
         run_otf.run(yaml_params)
     else:
-        preprocessing(yaml_params)
+        pp.preprocessing(yaml_params, run_logger)

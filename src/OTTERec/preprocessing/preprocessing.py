@@ -9,6 +9,8 @@ Date: 09-Mar-2021
 Disclaimer: adopted and modified from toolbox_tomoDLS.py from DLS repo
 """
 
+import os
+
 import OTTERec.preprocessing.metadata as metadata
 import OTTERec.preprocessing.worker as worker
 import OTTERec.preprocessing.motioncor as mc
