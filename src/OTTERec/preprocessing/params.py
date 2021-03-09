@@ -9,6 +9,7 @@ Date: 01-Mar-2021
 
 import os
 import sys
+import struct
 import yaml
 from glob import glob
 import pandas as pd
@@ -173,6 +174,98 @@ class Params:
         if isinstance(brt_group['coarse_align_bin_size'], str) and \
            brt_group['coarse_align_bin_size'] != 'auto':
             raise ValueError("BatchRunTomo.coarse_align_bin_size must be an int or 'auto'.")
+
+    def set_pixelsize(self, meta=None):
+        """
+        Modify pixel size if necessary, as well as hidden_mc_ftbin.
+
+        ARGS:
+        meta (Metadata):    a Metadata object containing raw, nb and tilt
+
+        If meta = None, convert current and desired pixel sizes to floats if possible.
+        If meta = DataFrame, extract the current pixel size from header, adjust the desired
+            pixel size if necessary ('current' or 'ps_x2').
+
+        In any case, try to compute hidden_mc_ftbin.
+        """
+        if meta is not None and \
+           self.params['Inputs']['pixel_size'] == 'header':
+            # ba_set_pixelsize can only be a float or 'header'.
+            # In the later, extract pixel size from header.
+            self.ba_set_pixelsize = self._get_pixel_size_from_meta(meta)
+
+        self._set_desired_pixelsize()
+        self._set_ftbin()
+
+    def _get_pixel_size_from_meta(self, meta):
+        """
+        Catch the pixel from header.
+        Check only for lowest tilt of every stack and make sure to have the same pixel size for every stacks.
+
+        ARGS:
+        meta (Metadata):    a Metadata object containing raw, nb and tilt
+        """
+        pixelsizes = []
+        for stack in meta['nb'].unique():
+            meta_stack = meta[meta['nb'] == stack]
+            image = meta_stack['raw'].loc[meta_stack['tilt'].abs().idxmin(axis=0)]
+
+            pixelsizes.append(self._get_pixelsize_header(image))
+
+        if len(set(pixelsizes)) == 1:
+            return pixelsizes[0]
+        else:
+            raise Exception('Set pixel size: more than one pixel size was detected. '
+                            'It is not supported at the moment, so stop here...')
+
+    def _set_desired_pixelsize(self):
+        """
+        If the desired pixel size rely on the current pixel size, update it.
+        """
+        if not isinstance(self.params['Inputs']['pixel_size'], str):
+            if not self.params['MotionCor']['run_MotionCor2']:
+                self.params['MotionCor']['desired_pixel_size'] = self.params['Inputs']['pixel_size']
+            else:
+                if self.params['MotionCor']['desired_pixel_size'] == 'ps_x2':
+                    self.params['MotionCor']['desired_pixel_size'] = self.params['Inputs']['pixel_size'] * 2
+                elif self.params['MotionCor']['desired_pixel_size'] == 'current':
+                    self.params['MotionCor']['desired_pixel_size'] = self.params['Inputs']['pixel_size']
+
+    def _set_ftbin(self):
+        """
+        Compute Ftbin for MotionCor2.
+        """
+        if isinstance(self.params['Inputs']['pixel_size'], (int, float)) and \
+           isinstance(self.params['MotionCor']['desired_pixel_size'], (int, float)):
+            self.hidden_mc_ftbin = self.params['MotionCor']['desired_pixel_size'] / self.params['Inputs']['pixel_size']
+
+    @staticmethod
+    def _get_pixelsize_header(mrc_filename):
+        """
+        Parse the header and compute the pixel size.
+
+        ARGS:
+        mrc_filename (str): name of the MRC file
+        """
+        size = 4
+        offsets = [0, 4, 8, 40, 44, 48]
+        structs = '3i3f'
+        header = b''
+
+        with open(mrc_filename, 'rb') as f:
+            for offset in offsets:
+                f.seek(offset)
+                header += f.read(size)
+
+        [nx, ny, nz,
+         cellax, cellay, cellaz] = struct.unpack(structs, header)
+
+        # make sure the pixel size is the same for each axis
+        px, py, pz = cellax / nx, cellay / ny, cellaz / nz
+        if math.isclose(px, py, rel_tol=1e-4) and math.isclose(px, pz, rel_tol=1e-4):
+            return px
+        else:
+            raise Exception(f'Extract pixel size: {mrc_filename} has different pixel sizes in x, y and z.')
 
 
 def generate_yaml(filename):
