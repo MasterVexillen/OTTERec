@@ -21,18 +21,21 @@ class Metadata:
     Class encapsulating a Metadata object
     """
 
-    def __init__(self, params_in):
+    def __init__(self, paramsObj, loggerObj):
         """
         Initialising a Metadata object
 
         ARGS:
-        params_in (Params obj): input parameters
+        paramsObj (Params): Params object containing input parameters
+        loggerObj (Logger): Logger object for logging progress
         """
-        self.pObj = params_in
+        self.pObj = paramsObj
         self.params = self.pObj.params
         self.stacks_nb = None
         self.stacks_tilt = None
         self.images_per_stack = None
+
+        self.logger = loggerObj
 
         # Set path to raw files
         if self.params['MotionCor']['run_MotionCor2']:
@@ -65,6 +68,13 @@ class Metadata:
 
         return meta
 
+    def save_processed_stack(self):
+        """
+        Save in a text file the stacks that were processed.
+        """
+        with open(self.pObj.hidden_queue_filename, 'a') as f:
+            f.write('\n:' + ':'.join((str(i) for i in self.stacks_nb)) + ':')
+
     def _collect_raw_files(self):
         """
         Function to collect files and compile into a single pandas dataframe for processing
@@ -79,7 +89,12 @@ class Metadata:
         if len(raw_files) == 0:
             raise IOError("Error in metadata.Metadata._collect_raw_files: Files not found.")
 
-        # Needs cleaning here
+        raw_files, raw_files_nb, raw_files_tilt = self._clean_raw_files(raw_files)
+        if not raw_files:
+            self.logger('Nothing to process (maybe it is already processed?).')
+            exit()
+
+        return pd.DataFrame(dict(raw=raw_files, nb=raw_files_nb, tilt=raw_files_tilt))
 
     def _clean_raw_files(self, file_list):
         """
