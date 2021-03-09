@@ -17,7 +17,7 @@ def main():
         entry_points={
             "console_scripts": [
                 "OTTERec.check=OTTERec.main:check",
-                "OTTERec.run=OTTERec.main:run",
+                "OTTERec.run=OTTERec.main:run_revamp",
                 "OTTERec.new=OTTERec.main:new_revamp",
                 "OTTERec.validate=OTTERec.main:validate_revamp",
                 "OTTERec.lookup=OTTERec.preprocessing.params:params_lookup",

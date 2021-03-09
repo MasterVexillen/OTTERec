@@ -11,7 +11,7 @@ Disclaimer: adopted and modified from toolbox_tomoDLS.py from DLS repo
 
 import threading
 import datetime as dt
-from OTTERec.preprocess.params import Params
+from OTTERec.preprocessing.params import Params
 
 
 class Logger:

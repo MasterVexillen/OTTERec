@@ -5,31 +5,35 @@ A suite to automate cryoET image reconstruction under DLS workflow
 
 1. Git clone repo
 ```
-git clone https://github.com/MasterVexillen/autorec.git
-cd autorec
+git clone https://github.com/MasterVexillen/OTTERec.git
+cd OTTERec
 ```
 
 2. Create virtual environment in miniconda and pre-install packages
 ```
-conda create -n autorec-env
-conda activate autorec-env
+conda create -n otterec-env
+conda activate otterec-env
 conda install --file requirements.txt
 ```
 
-3. Build autorec
+3. Build OTTERec
 ```
 python setup.py develop
 ```
 
-## Running autorec
-1. Activate autorec environment and load imod
+## Running OTTERec
+1. Activate OTTERec environment and load imod
 ```
-conda activate autorec-env
+conda activate otterec-env
 module load imod
 ```
-2. Run autorec
+2. Checkout tomodls_revamp branch
 ```
-autorec.TASK [option]
+git checkout tomodls_revamp
+```
+3. Run OTTERec
+```
+OTTERec.TASK [option]
 ```
 where `TASK` can be:
    * `lookup`: Prints out essential information about a given parameter. *option* is the parameter in the old format or new `GROUP.NAME` format, but must be present.
