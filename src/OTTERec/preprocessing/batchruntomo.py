@@ -9,6 +9,93 @@ Date: 08-Mar-2021
 Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
+import subprocess
+
+
+ADOC = f"""
+# INPUT FILE BATCHRUNTOMO #
+
+# Setup #
+setupset.copyarg.gold = <ba_brt_gold_size>
+setupset.copyarg.rotation = <ba_brt_rotation_angle>
+setupset.copyarg.dual = 0
+setupset.copyarg.userawtlt = 1
+setupset.scanHeader = 1
+
+
+# Preprocessing #
+runtime.Preprocessing.any.removeXrays = 1
+runtime.Preprocessing.any.archiveOriginal = 0
+runtime.Preprocessing.any.endExcludeCriterion = 1
+runtime.Preprocessing.any.darkExcludeRatio = 0.17
+runtime.Preprocessing.any.darkExcludeFraction = 0.33
+runtime.Preprocessing.any.removeExcludedViews = 1
+
+
+# Coarse alignment #
+comparam.xcorr.tiltxcorr.ExcludeCentralPeak = 1
+comparam.xcorr.tiltxcorr.FilterRadius2 = 0.15
+comparam.prenewst.newstack.BinByFactor = <ad_brt_bin_coarse>
+comparam.prenewst.newstack.AntialiasFilter = -1
+comparam.prenewst.newstack.ModeToOutput =
+
+
+# Seeding and tracking #
+runtime.Fiducials.any.trackingMethod = 0
+runtime.Fiducials.any.seedingMethod = 1
+
+comparam.track.beadtrack.LocalAreaTracking = 1
+comparam.track.beadtrack.SobelFilterCentering = 1
+comparam.track.beadtrack.KernelSigmaForSobel = 1.5
+comparam.track.beadtrack.RoundsOfTracking = 4
+runtime.BeadTracking.any.numberOfRuns = 2
+
+comparam.autofidseed.autofidseed.TargetNumberOfBeads = <ad_brt_target_nb_beads>
+comparam.autofidseed.autofidseed.AdjustSizes = 1
+comparam.autofidseed.autofidseed.TwoSurfaces = 0
+comparam.autofidseed.autofidseed.MinGuessNumBeads = 3
+
+
+# Tomogram positionning #
+runtime.Positioning.any.sampleType = 2
+runtime.Positioning.any.thickness = 2000
+runtime.Positioning.any.hasGoldBeads = 1
+comparam.cryoposition.cryoposition.BinningToApply = 5
+
+
+# Alignment #
+comparam.align.tiltalign.SurfacesToAnalyze = 1
+comparam.align.tiltalign.LocalAlignments = 1
+comparam.align.tiltalign.RobustFitting = 1
+
+#comparam.align.tiltalign.MagOption = 0
+#comparam.align.tiltalign.TiltOption = 0
+#comparam.align.tiltalign.RotOption = -1
+#comparam.align.tiltalign.BeamTiltOption = 2
+
+runtime.TiltAlignment.any.enableStretching = 0
+runtime.PatchTracking.any.adjustTiltAngles = 0
+
+
+# Final aligned stack #
+runtime.AlignedStack.any.correctCTF = 0
+runtime.AlignedStack.any.eraseGold = 2
+runtime.AlignedStack.any.filterStack = 0
+runtime.AlignedStack.any.binByFactor = <ad_brt_bin_ali>
+runtime.AlignedStack.any.linearInterpolation = 1
+comparam.newst.newstack.AntialiasFilter = 1
+
+runtime.GoldErasing.any.extraDiameter = 4
+runtime.GoldErasing.any.thickness = 3300
+comparam.golderaser.ccderaser.ExpandCircleIterations = 3
+
+
+# Reconstruction #
+comparam.tilt.tilt.THICKNESS = 1500
+comparam.tilt.tilt.FakeSIRTiterations = 8
+runtime.Trimvol.any.reorient = 2
+"""
+
 
 class Batchruntomo:
     """
@@ -32,12 +119,12 @@ class Batchruntomo:
         self.path = stack_path
         self.filename_adoc = f'{self.path}/tool_preprocessing.adoc'
         self.first_run = True
-        self.log = f'{TAB}Batchruntomo:\n'
+        self.log = f'\tBatchruntomo:\n'
 
-        self._create_adoc(inputs)
+        self._create_adoc()
 
         # first run
-        batchruntomo = subprocess.run(self._get_batchruntomo(inputs),
+        batchruntomo = subprocess.run(self._get_batchruntomo(),
                                       stdout=subprocess.PIPE,
                                       encoding='ascii')
         self.stdout = batchruntomo.stdout
@@ -55,7 +142,7 @@ class Batchruntomo:
                 corrected_align.write(f)
 
             # second run with correct report threshold
-            batchruntomo = subprocess.run(self._get_batchruntomo(inputs),
+            batchruntomo = subprocess.run(self._get_batchruntomo(),
                                           stdout=subprocess.PIPE,
                                           encoding='ascii')
             self.stdout += batchruntomo.stdout
@@ -67,12 +154,11 @@ class Batchruntomo:
         """
         if self.params['BatchRunTomo']['adoc_file'] == 'default':
             # compute bin coarsed using desired pixel size
-            inputs.set_bin_coarsed()
             self.params['BatchRunTomo']['coarse_align_bin_size'] = \
                 round(float(self.params['BatchRunTomo']['bead_size']) /
                       (12.5 * 0.1 * self.params['MotionCor']['desired_pixel_size']))
 
-            adoc_file = adoc
+            adoc_file = ADOC
             convert_dict = {
                 'ba_brt_gold_size': self.params['BatchRunTomo']['bead_size'],
                 'ba_brt_rotation_angle': self.params['BatchRunTomo']['init_rotation_angle'],
@@ -94,7 +180,7 @@ class Batchruntomo:
                 self.filename_adoc = self.params['BatchRunTomo']['adoc_file']
             else:
                 self.params['BatchRunTomo']['adoc_file'] = 'default'
-                self._create_adoc(inputs)
+                self._create_adoc(self.pObj)
 
     def _get_batchruntomo(self):
         cmd = ['batchruntomo',
@@ -102,14 +188,14 @@ class Batchruntomo:
                '-RootName', self.rootname,
                '-CurrentLocation', self.path,
                '-CPUMachineList', 'localhost:4',
-               '-StartingStep', self.params['BatchRunTomo']['stpe_start'],
+               '-StartingStep', str(self.params['BatchRunTomo']['step_start']),
                '-EndingStep', f"{6 if self.params['BatchRunTomo']['step_end'] >= 6 else self.params['BatchRunTomo']['step_end']}",
         ]
 
         if self.first_run:
             self.first_run = False
         else:
-            cmd[-1] = self.params['BatchRunTomo']['step_end']
+            cmd[-1] = str(self.params['BatchRunTomo']['step_end'])
             cmd[-3] = '6'
         return cmd
 
@@ -119,7 +205,7 @@ class Batchruntomo:
         if abort:
             for line in self.stdout:
                 if 'ABORT SET:' in line:
-                    self.log += f'{TAB * 2}{line}.\n'
+                    self.log += f'\t{line}.\n'
             return
 
         # erase.log
@@ -129,11 +215,11 @@ class Batchruntomo:
         # easier to catch the info directly in main log
         for line in self.stdout:
             if 'Views with locally extreme values:' in line:
-                self.log += f'{TAB * 2}- Stats: {line}.\n'
+                self.log += f'\t\t- Stats: {line}.\n'
             elif 'low SDs or dark regions' in line:
-                self.log += f'{TAB * 2}- Cliphist: {line}.\n'
+                self.log += f'\t\t- Cliphist: {line}.\n'
             elif 'total points accepted' in line:
-                self.log += f"{TAB * 2}- Autofidseed: {line.split('=')[-1]} beads accepted as fiducials.\n"
+                self.log += f"\t\t- Autofidseed: {line.split('=')[-1]} beads accepted as fiducials.\n"
 
         # track.log
         self.log += self._get_batchruntomo_log_track(f'{self.path}/track.log')
@@ -141,10 +227,10 @@ class Batchruntomo:
         # restricalign.log
         for line in self.stdout:
             if 'restrictalign: Changed align.com' in line:
-                self.log += f'{TAB * 2}- Restrictalign: Restriction were applied to statisfy measured/unknown ratio.\n'
+                self.log += f'\t\t- Restrictalign: Restriction were applied to statisfy measured/unknown ratio.\n'
                 break
             elif 'restrictalign: No restriction of parameters needed' in line:
-                self.log += f'{TAB * 2}- Restrictalign: No restriction of parameters needed.\n'
+                self.log += f'\t\t- Restrictalign: No restriction of parameters needed.\n'
                 break
 
         self.log += self._get_batchruntomo_log_align(self.stdout)
@@ -161,9 +247,9 @@ class Batchruntomo:
                         count_pixel += int(line.split()[3])
                     elif 'SUCCESSFULLY COMPLETED' in line:
                         exit_status = 'Succeded'
-            log = f'{TAB * 2}- Erase: {count_pixel} pixels were replaced. Exit status: {exit_status}.\n'
+            log = f'\t\t- Erase: {count_pixel} pixels were replaced. Exit status: {exit_status}.\n'
         except IOError:
-            log = f'{TAB * 2}erase.log is missing... Alignment may have failed.\n'
+            log = f'\t\terase.log is missing... Alignment may have failed.\n'
         return log
 
     @staticmethod
@@ -178,9 +264,9 @@ class Batchruntomo:
                         missing_points = line.split(' ')[-1].strip('\n')
                     elif 'SUCCESSFULLY COMPLETED' in line:
                         exit_status = 'Succeded'
-            log = f'{TAB * 2}- Track beads: {missing_points} missing points. Exit status: {exit_status}.\n'
+            log = f'\t\t- Track beads: {missing_points} missing points. Exit status: {exit_status}.\n'
         except IOError:
-            log = f'{TAB * 2}track.log is missing... Alignment may have failed.\n'
+            log = f'\t\ttrack.log is missing... Alignment may have failed.\n'
         return log
 
     @staticmethod
@@ -199,7 +285,7 @@ class Batchruntomo:
             if 'Weighted error local mean:' in line:
                 weighted_error_local_mean = line.strip()
 
-        return (f'{TAB * 2}{residual_error_mean_and_sd}\n'
-                f'{TAB * 2}{residual_error_weighted_mean}\n'
-                f'{TAB * 2}{residual_error_local_mean}\n'
-                f'{TAB * 2}{weighted_error_local_mean}\n')
+        return (f'\t\t{residual_error_mean_and_sd}\n'
+                f'\t\t{residual_error_weighted_mean}\n'
+                f'\t\t{residual_error_local_mean}\n'
+                f'\t\t{weighted_error_local_mean}\n')

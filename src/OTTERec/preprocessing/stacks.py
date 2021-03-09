@@ -15,6 +15,8 @@ from glob import glob
 
 import subprocess
 
+import OTTERec.preprocessing.batchruntomo as brt
+
 
 class Stack:
     """
@@ -35,9 +37,8 @@ class Stack:
         ARGS:
         inputs (tuple): (task, logger, params)
         """
-        self.stack, self.meta_tilt, self.inputs = inputs[0]
-        self.logger = inputs[1]
-        self.pObj = inputs[2]
+        self.stack, self.meta_tilt, self.pObj = inputs[0]
+        self.loggerObj = inputs[1]
         self.params = self.pObj.params
 
         self.stack_padded = f"{self.stack:03}"
@@ -57,7 +58,6 @@ class Stack:
         self.meta_tilt = self.meta_tilt.sort_values(by='tilt', axis=0, ascending=True)
         self._create_rawtlt()
 
-    def __call__(self):
         # run newstack
         if self.params['Run']['create_stack']:
             self._create_template_newstack()
@@ -74,9 +74,9 @@ class Stack:
 
         # run batchruntomo and send the logs to logger
         if self.params['BatchRunTomo']['align_images_brt']:
-            batchruntomo = Batchruntomo(self.pObj,
-                                        self.filename_stack,
-                                        self.path)
+            batchruntomo = brt.Batchruntomo(self.pObj,
+                                            self.filename_stack,
+                                            self.path)
             self.log += batchruntomo.log
 
         self.loggerObj(self.log, newline=True)

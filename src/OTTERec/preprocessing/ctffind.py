@@ -31,7 +31,7 @@ class CTFfind:
 
         stack_padded = f'{self.stack:03}'
         stack_display_nb = f'stack{stack_padded}'
-        path_stack = f"{self.params['Outputs']['stacks_path']}/self.stack{stack_padded}"
+        path_stack = f"{self.params['Outputs']['stacks_path']}/stack{stack_padded}"
         filename_log = f"{path_stack}/{self.params['Outputs']['output_prefix']}_{stack_padded}_ctffind.log"
 
         self.filename_output = f"{path_stack}/{self.params['Outputs']['output_prefix']}_{stack_padded}_ctffind.mrc"
@@ -91,7 +91,6 @@ class CTFfind:
                       'no']
 
         input_string = '\n'.join(input_dict)
-        print("5b", input_string)
         return cmd, input_string
 
 

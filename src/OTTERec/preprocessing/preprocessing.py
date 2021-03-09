@@ -64,14 +64,10 @@ def preprocessing(paramsObj, loggerObj):
         job2do = [tilt_number, meta_tilt, paramsObj]
         args = (job2do, loggerObj)
         if params['CTFFind']['run_ctffind']:
-#            print('Start - CTFFind')
             wObj.new_async(ctf.CTFfind, args)
-#            print('End - CTFFind')
-#         if params['Run']['create_stack'] or \
-#            params['BatchRunTomo']['align_image_brt']:
-# #            print('Start - stack')
-#             wObj.new_async(stacks.Stack, args)
-# #            print('End - stack')
+        if params['Run']['create_stack'] or \
+           params['BatchRunTomo']['align_image_brt']:
+            wObj.new_async(stacks.Stack, args)
 
     # wrap everything up
     wObj.close()
