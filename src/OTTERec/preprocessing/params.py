@@ -33,6 +33,8 @@ class Params:
         self.hidden_queue_filename = 'toolbox_stack_processed.txt'
         self.hidden_run_nb = None  # just for warning, remember positive restriction
 
+        self._set_stack()
+        
     def validate(self):
         """
         Validate parameters
@@ -174,6 +176,37 @@ class Params:
         if isinstance(brt_group['coarse_align_bin_size'], str) and \
            brt_group['coarse_align_bin_size'] != 'auto':
             raise ValueError("BatchRunTomo.coarse_align_bin_size must be an int or 'auto'.")
+
+    def _set_stack(self):
+        """
+        ad_run_nb can be modified by the command line (--nb) or by the inputs (file or interactive).
+        It will be read by Metadata, which expects a list of int or empty list.
+
+        At this point, ad_run_nb is a string.
+        If 'all', all the available stacks should be selected: Set it to [].
+        If string of integers (separated by comas), restricts to specific stacks:
+            Convert str of int -> list of int.
+
+        NB: In addition to these possible restrictions, Metadata._exclude_queue can add a negative (process
+            everything except these ones) priority restriction using the tool_processed.queue file.
+
+        NB: When on-the-fly, self.ad_run_nb will be set to the queue.
+        """
+        tmp = []
+        if isinstance(self.params['Run']['process_stacks_list'], str) and \
+           self.params['Run']['process_stacks_list'] != 'all':
+            if not self.params['On-the-fly']['run_otf']:
+                try:
+                    for nb in self.params['Run']['process_stacks_list'].split(','):
+                        tmp.append(int(nb))
+                except ValueError:
+                    raise ValueError("Restrict stack: ad_run_nb must be 'all' "
+                                     "or list of integers separated by comas.")
+            # just for self.warning
+            else:
+                self.hidden_run_nb = self.params['Run']['process_stacks_list']
+        self.params['Run']['process_stacks_list'] = tmp
+        print(self.params['Run']['process_stacks_list'])
 
     def set_pixelsize(self, meta=None):
         """

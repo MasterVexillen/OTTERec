@@ -9,7 +9,9 @@ Date: 05-Mar-2021
 Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
+import os
 import subprocess
+import itertools
 
 
 class MotionCor:
@@ -64,13 +66,13 @@ class MotionCor:
         """
 
         if self.first_run:
-            jobs_per_gpu = int(self.params['MotionCor']['jobs_per_cpu'])
+            jobs_per_gpu = int(self.params['MotionCor']['jobs_per_gpu'])
         else:
             jobs_per_gpu = 1
         self.first_run = False
 
         # Prepare generator for each image. Multiply by GPUs to allow iteration by chunks of GPUs.
-        mc_commands = [self._get_command((_in, _out, _gpu), self.params)
+        mc_commands = [self._get_command((_in, _out, _gpu))
                        for _in, _out, _gpu in zip(self.meta_tilt.raw, self.meta_tilt.output, self.meta_tilt.gpu)]
 
         jobs = (subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
@@ -98,7 +100,7 @@ class MotionCor:
         list
         """
 
-        if inputs['Inputs']['source_tiffs']:
+        if self.params['Inputs']['source_tiffs']:
             input_motioncor = 'InTiff'
         else:
             input_motioncor = 'InMrc'
@@ -107,16 +109,17 @@ class MotionCor:
                 f'-{input_motioncor}', image[0],
                 '-OutMrc', image[1],
                 '-Gpu', image[2],
-                '-GpuMemUsage', self.params['MotionCor']['gpu_memory_usage'],
+                '-GpuMemUsage', str(self.params['MotionCor']['gpu_memory_usage']),
                 '-Gain', self.params['Inputs']['gain_reference_file'],
-                '-Tol', self.params['MotionCor']['tolerance'],
-                '-Patch', self.params['MotionCor']['patch_size'],
-                '-Iter', self.params['MotionCor']['max_iterations'],
-                '-Group', self.params['MotionCor']['use_subgroups'],
+                '-Tol', str(self.params['MotionCor']['tolerance']),
+                '-Patch', ','.join(str(i) for i in self.params['MotionCor']['patch_size']),
+                '-Iter', str(self.params['MotionCor']['max_iterations']),
+                '-Group', '1' if self.params['MotionCor']['use_subgroups'] else '0',
                 '-FtBin', str(self.pObj.hidden_mc_ftbin),
                 '-PixSize', str(self.params['Inputs']['pixel_size']),
-                '-Throw', self.params['MotionCor']['discard_frames_top'],
-                '-Trunc', self.params['MotionCor']['discard_frames_bottom']]
+                '-Throw', str(self.params['MotionCor']['discard_frames_top']),
+                '-Trunc', str(self.params['MotionCor']['discard_frames_bottom']),
+        ]
 
     def _check_motioncor_output(self):
         """
@@ -136,7 +139,7 @@ class MotionCor:
     def _yield_chunks(iterable, size):
         iterator = iter(iterable)
         for first in iterator:
-            yield itertools.chain([first], itertools.islice(iterator, size - 1))
+             yield itertools.chain([first], itertools.islice(iterator, size - 1))
 
     @staticmethod
     def _update_progress(runs, run, head, done=None):

@@ -33,20 +33,20 @@ def preprocessing(paramsObj, loggerObj):
 
     loggerObj('Start preprocessing.')
 
-    mObj = metadata.Metadata(paramsObj)
+    mObj = metadata.Metadata(paramsObj, loggerObj)
     meta = mObj.get_metadata()
 
     # once the metadata is loaded, set its pixel size and calculate Ftbin
-    inputs.set_pixelsize(meta)
+    paramsObj.set_pixelsize(meta)
 
     # some stdout
-    logger(f"Collecting data:\n"
+    loggerObj(f"Collecting data:\n"
            f"\tRaw images: {mObj.stacks_len}\n"
            f"\tTilt-series: {mObj.stacks_nb}\n"
            f"\tPossible nb of images per stack: {mObj.stacks_images_per_stack}")
     if params['MotionCor']['run_MotionCor2']:
         gpu_list = params['MotionCor']['use_gpu']
-        logger(f"Starting MotionCor on GPU {', '.join([str(gpu) for gpu in gpu_list])}:")
+        loggerObj(f"Starting MotionCor on GPU {', '.join([str(gpu) for gpu in gpu_list])}:")
 
     wObj = worker.WorkerManager(mObj.stacks_nb, paramsObj)
 
@@ -56,7 +56,7 @@ def preprocessing(paramsObj, loggerObj):
         meta_tilt = meta[meta['nb'] == tilt_number]
 
         if params['MotionCor']['run_MotionCor2']:
-            mc.MotionCor(paramsObj, meta_tilt, tilt_number)
+            mc.MotionCor(paramsObj, meta_tilt, tilt_number, loggerObj)
 
         # communicate the job to workers
         job2do = [tilt_number, meta_tilt, paramsObj]

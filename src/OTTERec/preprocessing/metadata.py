@@ -10,6 +10,7 @@ Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
 import subprocess
+import math
 from glob import glob
 
 import pandas as pd
@@ -60,9 +61,9 @@ class Metadata:
         # set output file name and assign every image to one GPU
         if self.params['MotionCor']['run_MotionCor2']:
             meta['gpu'] = self._get_gpu_id()
-            output_str = f"{self.params['Outputs']['MotionCor2_path']}/{self.params['Outputs']['output_prefix']}_{row['nb']:03}_{row['tilt']}.mrc"
             meta['output'] = meta.apply(
-                lambda row: output_str, axis=1)
+                lambda row: f"{self.params['Outputs']['MotionCor2_path']}/"
+                f"{self.params['Outputs']['output_prefix']}_{row['nb']:03}_{row['tilt']}.mrc", axis=1)
         else:
             meta['output'] = meta['raw']
 
@@ -88,7 +89,7 @@ class Metadata:
         )
         if len(raw_files) == 0:
             raise IOError("Error in metadata.Metadata._collect_raw_files: Files not found.")
-
+    
         raw_files, raw_files_nb, raw_files_tilt = self._clean_raw_files(raw_files)
         if not raw_files:
             self.logger('Nothing to process (maybe it is already processed?).')
@@ -124,8 +125,8 @@ class Metadata:
         """
 
         # Remove stacks in stack_to_remove list
-        if self.params['Run']['run_rewrite'] or \
-           self.params['Run']['run_otf']:
+        if self.params['Run']['rewrite'] or \
+           self.params['On-the-fly']['run_otf']:
             stack_to_remove = list()
         else:
             stack_to_remove = self._exclude_stacks()
@@ -135,7 +136,7 @@ class Metadata:
         for curr_file in file_list:
             filename_split = curr_file.split('/')[-1].split('_')
             try:
-                stack_nb = int(''.join(i for i in filename_split[self.inputs.ba_set_field_nb] if i.isdigit()))
+                stack_nb = int(''.join(i for i in filename_split[self.params['Inputs']['stack_field']] if i.isdigit()))
             except IndexError or ValueError as err:
                 raise IndexError(f'Clean files (nb): {err}')
 
@@ -188,7 +189,7 @@ class Metadata:
         RETURNS:
         list
         """
-        if self.params['Run']['run_otf']:
+        if self.params['On-the-fly']['run_otf']:
             # Used for otf: every time pp is called, it must recompute the available GPUs.
             # Thus it needs to remember the original input.
             self.params['MotionCor']['use_gpu'] = self.pObj.hidden_oft_gpu
@@ -203,8 +204,8 @@ class Metadata:
                 raise ValueError("Get GPU: ba_mc_gpu must be an (list of) integers or 'auto'")
 
         # map to DataFrame
-        mc_gpu = [str(i) for i in self.self.params['MotionCor']['use_gpu']] * \
-            np.ceil(self.stacks_len / len(self.params['MotionCor']['use_gpu']))
+        mc_gpu = [str(i) for i in self.params['MotionCor']['use_gpu']] * \
+            math.ceil(self.stacks_len / len(self.params['MotionCor']['use_gpu']))
         len_diff = len(mc_gpu) - self.stacks_len
         if len_diff:
             mc_gpu = mc_gpu[:-len_diff]
