@@ -14,6 +14,8 @@ import os
 import OTTERec.preprocessing.metadata as metadata
 import OTTERec.preprocessing.worker as worker
 import OTTERec.preprocessing.motioncor as mc
+import OTTERec.preprocessing.ctffind as ctf
+import OTTERec.preprocessing.stacks as stacks
 
 
 def preprocessing(paramsObj, loggerObj):
@@ -60,11 +62,16 @@ def preprocessing(paramsObj, loggerObj):
 
         # communicate the job to workers
         job2do = [tilt_number, meta_tilt, paramsObj]
+        args = (job2do, loggerObj)
         if params['CTFFind']['run_ctffind']:
-            wObj.new_async(Ctffind, job2do)
-        if params['Run']['create_stack'] or \
-           params['BatchRunTomo']['align_image_brt']:
-            wObj.new_async(Stack, job2do)
+#            print('Start - CTFFind')
+            wObj.new_async(ctf.CTFfind, args)
+#            print('End - CTFFind')
+#         if params['Run']['create_stack'] or \
+#            params['BatchRunTomo']['align_image_brt']:
+# #            print('Start - stack')
+#             wObj.new_async(stacks.Stack, args)
+# #            print('End - stack')
 
     # wrap everything up
     wObj.close()

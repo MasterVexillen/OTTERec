@@ -110,7 +110,7 @@ class Params:
             'astigm_type': (str, type(None)),
             'exhaustive_search': bool,
             'astigm_restraint': bool,
-            'phase_shift': (int, float)
+            'phase_shift': (int, float, bool)
         }
 
         brt_types = {
@@ -206,7 +206,6 @@ class Params:
             else:
                 self.hidden_run_nb = self.params['Run']['process_stacks_list']
         self.params['Run']['process_stacks_list'] = tmp
-        print(self.params['Run']['process_stacks_list'])
 
     def set_pixelsize(self, meta=None):
         """
@@ -370,7 +369,7 @@ def generate_yaml(filename):
             'astigm_type': None,
             'exhaustive_search': False,
             'astigm_restraint': False,
-            'phase_shift': 0.,
+            'phase_shift': False,
         },
 
         'BatchRunTomo': {

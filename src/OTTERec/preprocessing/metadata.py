@@ -43,7 +43,7 @@ class Metadata:
             self.path = self.params['Inputs']['source_path']
             self.extension = 'tif'
         else:
-            self.path = self.params['Outputs']['motionCor2_path']
+            self.path = self.params['Outputs']['MotionCor2_path']
             self.extension = 'mrc'
 
     def get_metadata(self):

@@ -48,9 +48,9 @@ class MotionCor:
         self.meta_tilt = self._check_motioncor_output()
         if len(self.meta_tilt) > 0:
             self.logger(f"\nMotionCor WARNING:\n"
-                        f"{TAB}{len(self.meta_tilt)} images failed. It may be because no memory was available "
+                        f"\t{len(self.meta_tilt)} images failed. It may be because no memory was available "
                         f"on the device. You may stop the program and decrease MotionCor.jobs_per_gpu.\n"
-                        f"{TAB}Reprocessing the missing images one at a time... ", nl=True)
+                        f"\tReprocessing the missing images one at a time... ", newline=True)
             self._run_motioncor()
 
         # save output

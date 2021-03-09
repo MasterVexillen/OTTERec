@@ -10,10 +10,10 @@ Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
 import time
-import subprocess
+import os
+from glob import glob
 
-from OTTERec.preprocessing.params import Params
-from OTTERec.preprocessing.batchruntomo import BatchRunTomo
+import subprocess
 
 
 class Stack:
@@ -27,18 +27,17 @@ class Stack:
     I could also use __call__.
     """
 
-    def __init__(self, task, loggerObj, params_in):
+    def __init__(self, inputs):
         """
         Initialise the Stack object
         Once the stack is created, call Batchruntomo to start the alignment.
 
         ARGS:
-        task (list): list of tasks from worker manager
-        loggerObj (Logger): Logger object for logging progress
+        inputs (tuple): (task, logger, params)
         """
-        self.stack, self.meta_tilt, self.inputs = task
-        self.logger = loggerObj
-        self.pObj = params_in
+        self.stack, self.meta_tilt, self.inputs = inputs[0]
+        self.logger = inputs[1]
+        self.pObj = inputs[2]
         self.params = self.pObj.params
 
         self.stack_padded = f"{self.stack:03}"
@@ -58,6 +57,7 @@ class Stack:
         self.meta_tilt = self.meta_tilt.sort_values(by='tilt', axis=0, ascending=True)
         self._create_rawtlt()
 
+    def __call__(self):
         # run newstack
         if self.params['Run']['create_stack']:
             self._create_template_newstack()
@@ -67,7 +67,7 @@ class Stack:
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT)
             t2 = time.time()
-            self.log += f'{TAB}Newstack took {t2 - t1:.2f}s.\n'
+            self.log += f'\tNewstack took {t2 - t1:.2f}s.\n'
 
         elif not os.path.isfile(self.filename_stack):
             raise FileNotFoundError(f'Stack: {self.filename_stack} is not found and Run.create_stack=0.')
@@ -79,7 +79,7 @@ class Stack:
                                         self.path)
             self.log += batchruntomo.log
 
-        self.loggerObj(self.log, nl=True)
+        self.loggerObj(self.log, newline=True)
 
     def _create_template_newstack(self):
         """
@@ -117,11 +117,11 @@ class Stack:
                 raise ValueError
             rawtlt.sort()
             rawtlt = '\n'.join((str(i) for i in rawtlt)) + '\n'
-            self.log += f'{TAB}Mdoc file: True.\n'
+            self.log += f'\tMdoc file: True.\n'
 
         # no mdoc, more than one mdoc or mdoc with missing images
         except ValueError:
-            self.log += f'{TAB}Mdoc file: False.\n'
+            self.log += f'\tMdoc file: False.\n'
             rawtlt = '\n'.join(self.meta_tilt['tilt'].astype(str)) + '\n'
 
         with open(self.filename_rawtlt, 'w') as f:

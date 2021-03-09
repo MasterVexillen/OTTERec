@@ -9,6 +9,7 @@ Date: 08-Mar-2021
 Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
+import os
 import subprocess
 
 
@@ -17,19 +18,16 @@ class CTFfind:
     Class encapsulating a CTFfind object
     """
 
-    def __init__(self, task, loggerObj, params_in):
+    def __init__(self, inputs):
         """
         Initialise the CTFfind object
 
         ARGS:
-        task (list): list of tasks from worker manager
-        loggerObj (Logger): Logger object for logging progress
-        params_in (Params): Input parameters
+        inputs (tuple): (task, logger, params)
         """
-        self.stack, self.meta_tilt, self.inputs = task
-        self.logger = loggerObj
-        self.pObj = params_in
-        self.params = self.pObj.params
+        self.stack, self.meta_tilt, self.inputs = inputs[0]
+        self.logger = inputs[1]
+        self.params = self.inputs.params
 
         stack_padded = f'{self.stack:03}'
         stack_display_nb = f'stack{stack_padded}'
@@ -41,12 +39,12 @@ class CTFfind:
         self.stdout = None
 
         # Get the image closest to 0. Only this one will be used.
-        image = self.meta_tilt.loc[self.meta_tilt['tilt'].abs().idxmin(axis=0)]
+        self.image = self.meta_tilt.loc[self.meta_tilt['tilt'].abs().idxmin(axis=0)]
 
         # get ctffind command and run
         os.makedirs(path_stack, exist_ok=True)
 
-        ctf_command, ctf_input_string = self._get_ctffind(image)
+        ctf_command, ctf_input_string = self._get_ctffind()
         ctffind_run = subprocess.run(ctf_command,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT,
@@ -65,34 +63,35 @@ class CTFfind:
 
         # send the logs back to main
         self._get_ctffind_log()
-        self.logger(self.log, nl=True)
+        self.logger(self.log, newline=True)
 
-    def _get_ctffind(self, image):
+    def _get_ctffind(self):
         """
         Function to return command for CTFfind
 
         The inputs will go through stdin. Last input: expert options=no.
         """
-        cmd = [self.params['CTFfind']['CTFfind_path']]
-        input_dict = [image['output'],
+        cmd = [self.params['CTFFind']['CTFfind_path']]
+        input_dict = [self.image['output'],
                       self.filename_output,
                       str(self.params['MotionCor']['desired_pixel_size']),
-                      self.params['CTFfind']['voltage'],
-                      self.params['CTFfind']['spherical_aberration'],
-                      self.params['CTFfind']['amp_contrast'],
-                      self.params['CTFfind']['amp_spec_size'],
-                      self.params['CTFfind']['resolution_min'],
-                      self.params['CTFfind']['resolution_max'],
-                      self.params['CTFfind']['defocus_min'],
-                      self.params['CTFfind']['defocus_max'],
-                      self.params['CTFfind']['defocus_step'],
-                      self.params['CTFfind']['Astigm_type'],
-                      self.params['CTFfind']['exhaustive_search'],
-                      self.params['CTFfind']['astigm_restraint'],
-                      self.params['CTFfind']['phase_shift'],
+                      str(self.params['CTFFind']['voltage']),
+                      str(self.params['CTFFind']['spherical_aberration']),
+                      str(self.params['CTFFind']['amp_contrast']),
+                      str(self.params['CTFFind']['amp_spec_size']),
+                      str(self.params['CTFFind']['resolution_min']),
+                      str(self.params['CTFFind']['resolution_max']),
+                      str(self.params['CTFFind']['defocus_min']),
+                      str(self.params['CTFFind']['defocus_max']),
+                      str(self.params['CTFFind']['defocus_step']),
+                      str(self.params['CTFFind']['astigm_type']) if self.params['CTFFind']['astigm_type'] else 'no',
+                      'yes' if self.params['CTFFind']['exhaustive_search'] else 'no',
+                      'yes' if self.params['CTFFind']['astigm_restraint'] else 'no',
+                      'yes' if self.params['CTFFind']['phase_shift'] else 'no',
                       'no']
 
         input_string = '\n'.join(input_dict)
+        print("5b", input_string)
         return cmd, input_string
 
 
@@ -111,6 +110,6 @@ class CTFfind:
 
         for line in possible_lines:
             if any(item in line for item in look4):
-                self.log += f'{TAB}{line}\n'
+                self.log += f'\t{line}\n'
             else:
                 continue

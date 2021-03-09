@@ -11,6 +11,7 @@ Disclaimer: Adopted and modified from toolbox_tomoDLS.py from Diamond repo
 
 from threading import Semaphore
 import multiprocess
+import os
 
 from OTTERec.preprocessing.params import Params
 
@@ -48,7 +49,7 @@ class WorkerManager:
         Start a new task, wait if all worker are busy.
         """
         self.semaphore.acquire()
-        self.pool.apply_async(run, args=(task,),
+        self.pool.apply_async(run, args=(task, ),
                               callback=self.task_done,
                               error_callback=self.task_failed)
 
