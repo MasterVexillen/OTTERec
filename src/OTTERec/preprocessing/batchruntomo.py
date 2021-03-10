@@ -42,7 +42,7 @@ comparam.prenewst.newstack.ModeToOutput =
 
 # Seeding and tracking #
 runtime.Fiducials.any.trackingMethod = 0
-runtime.Fiducials.any.seedingMethod = 1
+runtime.Fiducials.any.seedingMethod = 3
 
 comparam.track.beadtrack.LocalAreaTracking = 1
 comparam.track.beadtrack.SobelFilterCentering = 1
@@ -51,9 +51,9 @@ comparam.track.beadtrack.RoundsOfTracking = 4
 runtime.BeadTracking.any.numberOfRuns = 2
 
 comparam.autofidseed.autofidseed.TargetNumberOfBeads = <ad_brt_target_nb_beads>
-comparam.autofidseed.autofidseed.AdjustSizes = 1
+comparam.autofidseed.autofidseed.AdjustSizes = 0
 comparam.autofidseed.autofidseed.TwoSurfaces = 0
-comparam.autofidseed.autofidseed.MinGuessNumBeads = 3
+comparam.autofidseed.autofidseed.MinGuessNumBeads = 12
 
 
 # Tomogram positionning #

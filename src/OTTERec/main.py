@@ -22,6 +22,28 @@ import OTTERec.preprocessing.otf as otf
 import OTTERec.preprocessing.preprocessing as pp
 
 
+LOGO = f"""
+                                  .----.__
+                                 / c  ^  _`;
+                                 |     .--'
+       OOOOOOO         TTTTT      \   (                     RRRRRRRRRRR
+     OOOOOOOOOO       TTTTT       /  -.\                    RRRRRRRRRRRRR
+    OOOO    OOOO   TTTTTTTTTTT   / .    \         EEEEEE    RRRR     RRRRR     EEEEEE        CCCCCC   
+   OOOO      OOO  TTTTTTTTTTT   /  \    |       EEEEEEEEE   RRRR      RRRR   EEEEEEEEE     CCCCCCCCC  
+  OOOO       OOO TTTTTTTTTTT   ;    `-. `.     EEEE    EEE  RRRR     RRRR   EEEE    EEE   CCCC    CCC 
+  OOO        OOO   TTTTT       |      /`'.`.  EEEE     EEEE RRRRRRRRRRRR   EEEE     EEEE CCCC     CCCC
+  OOO        OOO  TTTTT        |      |   \ \ EEEEEEEEEEEEE RRRRRRRRRR     EEEEEEEEEEEEE CCCC         
+  OOOO      OOOO TTTTT    TTT  |    __|    `' EEEE          RRRR    RRR    EEEE          CCCC         
+  OOOOO    OOOO   TTTTT  TTT   ;   /   \      EEEE    EEEE  RRRR    RRRR   EEEE    EEEE  CCCC    CCCC 
+   OOOOOOOOOOO     TTTTTTTT   ,'        |      EEEEEEEEEE   RRRR     RRRR   EEEEEEEEEE    CCCCCCCCCC  
+     OOOOOO         TTTTT    (_`'---._ /--,     EEEEEEEE    RRRR      RRRR   EEEEEEEE      CCCCCCCC   
+                               `'---._`'---..__
+                                      `''''--, )
+                                        _.-'`,`
+                                         ````
+"""
+
+
 def check():
     """
     Perform final check for essential files
@@ -139,9 +161,7 @@ def run_revamp():
     Run all preprocessing procedures
     """
 
-    print(f'\nOTTERec\n'
-          f'\t- From raw images to aligned stacks.\n'
-          f'\t- Version: 1.0\n')
+    print(LOGO)
 
     if len(sys.argv) != 2:
         raise ValueError("Error in input length. USAGE: OTTERec.run YAML")
@@ -150,10 +170,24 @@ def run_revamp():
     yaml_params = params.read_yaml(yaml_name)
     run_logger = logger.Logger(yaml_params)
 
+    task_bar = f"""
+    ==============================
+    -------      TASKS     -------
+    ==============================
+    """
+
+    log_bar = f"""
+    ==============================
+    -------       LOG      -------
+    ==============================
+    """
+
+    print(task_bar)
     print(f"MotionCor2:   {yaml_params.params['MotionCor']['run_MotionCor2']}\n"
           f"Ctffind:      {yaml_params.params['CTFFind']['run_ctffind']}\n"
           f"New stack:    {yaml_params.params['Run']['create_stack']}\n"
-          f"Batchruntomo: {yaml_params.params['BatchRunTomo']['align_images_brt']}\n")
+          f"Batchruntomo: {yaml_params.params['BatchRunTomo']['align_images_brt']}\n\n")
+    print(log_bar      )
 
     if yaml_params.params['On-the-fly']['run_otf']:
         print(f"On-the-fly processing: (Tolerated inactivity: {yaml_params.params['On-the-fly']['timeout']}min).")
