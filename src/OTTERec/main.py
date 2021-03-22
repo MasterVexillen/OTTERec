@@ -161,6 +161,7 @@ def run_revamp():
     Run all preprocessing procedures
     """
 
+    os.system('clear')
     print(LOGO)
 
     if len(sys.argv) != 2:

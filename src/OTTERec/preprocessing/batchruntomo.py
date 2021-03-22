@@ -10,6 +10,7 @@ Disclaimer: Adopted and modified from toolbox_tomoDLS.py script at Diamond
 """
 
 import subprocess
+import multiprocess as mp
 
 
 ADOC = f"""
@@ -18,6 +19,8 @@ ADOC = f"""
 # Setup #
 setupset.copyarg.gold = <ba_brt_gold_size>
 setupset.copyarg.rotation = <ba_brt_rotation_angle>
+setupset.copyarg.voltage = 300
+setupset.copyarg.Cs = 2.7
 setupset.copyarg.dual = 0
 setupset.copyarg.userawtlt = 1
 setupset.scanHeader = 1
@@ -26,47 +29,64 @@ setupset.scanHeader = 1
 # Preprocessing #
 runtime.Preprocessing.any.removeXrays = 1
 runtime.Preprocessing.any.archiveOriginal = 0
-runtime.Preprocessing.any.endExcludeCriterion = 1
+runtime.Preprocessing.any.endExcludeCriterion = 0
 runtime.Preprocessing.any.darkExcludeRatio = 0.17
 runtime.Preprocessing.any.darkExcludeFraction = 0.33
-runtime.Preprocessing.any.removeExcludedViews = 1
+runtime.Preprocessing.any.removeExcludedViews = 0
 
+#comparam.eraser.ccderaser.BoundaryObjects = 3
+comparam.eraser.ccderaser.PeakCriterion = 10.
+comparam.eraser.ccderaser.DiffCriterion = 8.
+comparam.eraser.ccderaser.MaximumRadius = 4.2
 
 # Coarse alignment #
 comparam.xcorr.tiltxcorr.ExcludeCentralPeak = 1
-comparam.xcorr.tiltxcorr.FilterRadius2 = 0.15
-comparam.prenewst.newstack.BinByFactor = <ad_brt_bin_coarse>
+comparam.xcorr.tiltxcorr.FilterRadius2 = 0.25
+comparam.xcorr.tiltxcorr.FilterSigma2 = 0.05
+comparam.prenewst.newstack.BinByFactor = 6
 comparam.prenewst.newstack.AntialiasFilter = -1
 comparam.prenewst.newstack.ModeToOutput =
 
 
 # Seeding and tracking #
-runtime.Fiducials.any.trackingMethod = 0
-runtime.Fiducials.any.seedingMethod = 3
+runtime.Fiducials.any.trackingMethod = 1
+runtime.Fiducials.any.seedingMethod = 0
+
+comparam.xcorr_pt.tiltxcorr.SizeOfPatchesXandY = 300, 300
+comparam.xcorr_pt.tiltxcorr.OverlapOfPatchesXandY = 0.33, 0.33
+comparam.xcorr_pt.tiltxcorr.IterateCorrelations = 4
+comparam.xcorr_pt.tiltxcorr.FilterSigma1 = 0.03
+comparam.xcorr_pt.tiltxcorr.FilterRadius2 = 0.25
+comparam.xcorr_pt.tiltxcorr.FilterSigma2 = 0.05
+#comparam.xcorr_pt.tiltxcorr.BordersinXandY = 48, 34
 
 comparam.track.beadtrack.LocalAreaTracking = 1
 comparam.track.beadtrack.SobelFilterCentering = 1
 comparam.track.beadtrack.KernelSigmaForSobel = 1.5
 comparam.track.beadtrack.RoundsOfTracking = 4
-runtime.BeadTracking.any.numberOfRuns = 2
 
-comparam.autofidseed.autofidseed.TargetNumberOfBeads = <ad_brt_target_nb_beads>
-comparam.autofidseed.autofidseed.AdjustSizes = 0
-comparam.autofidseed.autofidseed.TwoSurfaces = 0
-comparam.autofidseed.autofidseed.MinGuessNumBeads = 12
+# comparam.autofidseed.autofidseed.TargetNumberOfBeads = <ad_brt_target_nb_beads>
+# comparam.autofidseed.autofidseed.AdjustSizes = 1
+# comparam.autofidseed.autofidseed.TwoSurfaces = 1
+# comparam.autofidseed.autofidseed.MinGuessNumBeads = 20
 
 
-# Tomogram positionning #
+# Tomogram positioning #
 runtime.Positioning.any.sampleType = 2
-runtime.Positioning.any.thickness = 2000
-runtime.Positioning.any.hasGoldBeads = 1
-comparam.cryoposition.cryoposition.BinningToApply = 5
+runtime.Positioning.any.wholeTomogram = 1
+runtime.Positioning.any.binByFactor = 6
+runtime.Positioning.any.thickness = 3000
+
+runtime.Positioning.any.hasGoldBeads = 0
+comparam.cryoposition.cryoposition.BinningToApply = 6
 
 
 # Alignment #
 comparam.align.tiltalign.SurfacesToAnalyze = 1
-comparam.align.tiltalign.LocalAlignments = 1
-comparam.align.tiltalign.RobustFitting = 1
+comparam.align.tiltalign.LocalAlignments = 0
+comparam.align.tiltalign.RobustFitting = 0
+comparam.align.tiltalign.WeightWholeTracks = 1
+comparam.align.tiltalign.ResidualReportCriterion = 3.0
 
 #comparam.align.tiltalign.MagOption = 0
 #comparam.align.tiltalign.TiltOption = 0
@@ -75,23 +95,24 @@ comparam.align.tiltalign.RobustFitting = 1
 
 runtime.TiltAlignment.any.enableStretching = 0
 runtime.PatchTracking.any.adjustTiltAngles = 0
+runtime.RestrictAlign.any.targetMeasurementRatio = 4
 
 
 # Final aligned stack #
 runtime.AlignedStack.any.correctCTF = 0
-runtime.AlignedStack.any.eraseGold = 2
+runtime.AlignedStack.any.eraseGold = 0
 runtime.AlignedStack.any.filterStack = 0
 runtime.AlignedStack.any.binByFactor = <ad_brt_bin_ali>
 runtime.AlignedStack.any.linearInterpolation = 1
 comparam.newst.newstack.AntialiasFilter = 1
 
 runtime.GoldErasing.any.extraDiameter = 4
-runtime.GoldErasing.any.thickness = 3300
+runtime.GoldErasing.any.thickness = 1000
 comparam.golderaser.ccderaser.ExpandCircleIterations = 3
 
 
 # Reconstruction #
-comparam.tilt.tilt.THICKNESS = 1500
+comparam.tilt.tilt.THICKNESS = 5000
 comparam.tilt.tilt.FakeSIRTiterations = 8
 runtime.Trimvol.any.reorient = 2
 """
@@ -116,7 +137,7 @@ class Batchruntomo:
         self.params = self.pObj.params
 
         self.rootname = stack_filename.split('/')[-1].replace('.st', '')
-        self.path = stack_path
+        self.path = stack_path[:-1] # have to remove the trailing /
         self.filename_adoc = f'{self.path}/tool_preprocessing.adoc'
         self.first_run = True
         self.log = f'\tBatchruntomo:\n'
@@ -124,17 +145,20 @@ class Batchruntomo:
         self._create_adoc()
 
         # first run
+        self.first_run = True
         batchruntomo = subprocess.run(self._get_batchruntomo(),
                                       stdout=subprocess.PIPE,
                                       encoding='ascii')
+        self.first_run = False
         self.stdout = batchruntomo.stdout
 
         # There is a small bug in the IMOD install. David said it will be fixed in the next release.
         # Basically, one cannot change the residual report threshold. So run batchruntomo first,
         # up to tiltalign in order to have align.com and then modify align.com and restart from there.
+
         if 'ABORT SET:' in self.stdout:
             self._get_batchruntomo_log(abort=True)
-        else:
+        elif self.params['BatchRunTomo']['step_end'] > 6:
             # change the threshold in align.com
             with open(f'{self.path}/align.com', 'r') as align:
                 f = align.read().replace('ResidualReportCriterion\t3', 'ResidualReportCriterion\t1')
@@ -183,20 +207,29 @@ class Batchruntomo:
                 self._create_adoc(self.pObj)
 
     def _get_batchruntomo(self):
-        cmd = ['batchruntomo',
-               '-DirectiveFile', self.filename_adoc,
-               '-RootName', self.rootname,
-               '-CurrentLocation', self.path,
-               '-CPUMachineList', 'localhost:4',
-               '-StartingStep', str(self.params['BatchRunTomo']['step_start']),
-               '-EndingStep', f"{6 if self.params['BatchRunTomo']['step_end'] >= 6 else self.params['BatchRunTomo']['step_end']}",
-        ]
-
+        temp_end = 6 if self.params['BatchRunTomo']['step_end'] >= 6 else self.params['BatchRunTomo']['step_end']
+        temp_gpu = self.params['MotionCor']['use_gpu'][0]
+        temp_cpu = [str(i) for i in range(1, mp.cpu_count()+1)]
         if self.first_run:
-            self.first_run = False
+            cmd = ['batchruntomo',
+                   '-CPUMachineList', f"{temp_cpu}",
+                   '-GPUMachineList', '1',
+                   '-DirectiveFile', self.filename_adoc,
+                   '-RootName', self.rootname,
+                   '-CurrentLocation', self.path,
+                   '-StartingStep', str(self.params['BatchRunTomo']['step_start']),
+                   '-EndingStep', f"{temp_end}",
+            ]
         else:
-            cmd[-1] = str(self.params['BatchRunTomo']['step_end'])
-            cmd[-3] = '6'
+            cmd = ['batchruntomo',
+                   '-CPUMachineList', f"{temp_cpu}",
+                   '-GPUMachineList', '1',
+                   '-DirectiveFile', self.filename_adoc,
+                   '-RootName', self.rootname,
+                   '-CurrentLocation', self.path,
+                   '-StartingStep', f"{temp_end+1}",
+                   '-EndingStep', str(self.params['BatchRunTomo']['step_end']),
+            ]
         return cmd
 
     def _get_batchruntomo_log(self, abort=False):
