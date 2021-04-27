@@ -93,7 +93,6 @@ class Metadata:
         raw_files, raw_files_nb, raw_files_tilt = self._clean_raw_files(raw_files)
         if not raw_files:
             self.logger('Nothing to process (maybe it is already processed?).')
-            exit()
 
         return pd.DataFrame(dict(raw=raw_files, nb=raw_files_nb, tilt=raw_files_tilt))
 
@@ -173,13 +172,13 @@ class Metadata:
             if remove_stack:
                 for line in remove_stack:
                     line = [int(i) for i in line.strip('\n').strip(' ').strip(':').split(':') if i != '']
-                    stack2remove += line
+                    stack_to_remove += line
 
-            return stack2remove
+            return stack_to_remove
 
         # first time running
         except IOError:
-            return stack2remove
+            return stack_to_remove
 
     def _get_gpu_id(self):
         """
