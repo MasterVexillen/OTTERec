@@ -187,7 +187,7 @@ def run_revamp():
     print(f"MotionCor2:   {yaml_params.params['MotionCor']['run_MotionCor2']}\n"
           f"Ctffind:      {yaml_params.params['CTFFind']['run_ctffind']}\n"
           f"New stack:    {yaml_params.params['Run']['create_stack']}\n"
-          f"Batchruntomo: {yaml_params.params['BatchRunTomo']['align_images_brt']}\n\n")
+          f"Batchruntomo: {yaml_params.params['BatchRunTomo']['general']['align_images_brt']}\n\n")
     print(log_bar      )
 
     if yaml_params.params['On-the-fly']['run_otf']:

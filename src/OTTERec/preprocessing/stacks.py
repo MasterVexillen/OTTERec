@@ -73,7 +73,7 @@ class Stack:
             raise FileNotFoundError(f'Stack: {self.filename_stack} is not found and Run.create_stack=0.')
 
         # run batchruntomo and send the logs to logger
-        if self.params['BatchRunTomo']['align_images_brt']:
+        if self.params['BatchRunTomo']['general']['align_images_brt']:
             batchruntomo = brt.Batchruntomo(self.pObj,
                                             self.filename_stack,
                                             self.path)

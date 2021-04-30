@@ -314,7 +314,7 @@ def generate_yaml(filename):
 	    'stack_field': 1,
 	    'tilt_angle_field': 3,
 	    'pixel_size': 'header',
-	    'source_tiffs': False,
+	    'source_tiffs': True,
 	    'gain_reference_file': 'nogain',
         },
 
@@ -343,15 +343,15 @@ def generate_yaml(filename):
             'run_MotionCor2': True,
             'MotionCor2_path': '/opt/modules/motioncor2/1.4.0/MotionCor2_1.4.0/MotionCor2_1.4.0_Cuda110',
             'desired_pixel_size': 'ps_x2',
-            'discard_frames_top': 0,
-            'discard_frames_bottom': 1,
+            'discard_frames_top': 1,
+            'discard_frames_bottom': 0,
             'tolerance': 0.5,
             'max_iterations': 10,
             'patch_size': [5, 5, 20],
             'use_subgroups': True,
             'use_gpu': 'auto',
-            'jobs_per_gpu': 3,
-            'gpu_memory_usage': 0.5,
+            'jobs_per_gpu': 1,
+            'gpu_memory_usage': 0.9,
         },
 
         'CTFFind': {
@@ -373,15 +373,66 @@ def generate_yaml(filename):
         },
 
         'BatchRunTomo': {
-            'align_images_brt': True,
-            'adoc_file': 'default',
-            'bead_size': 10.,
-            'init_rotation_angle': 86.,
-            'coarse_align_bin_size': 'auto',
-            'target_num_beads': 25,
-            'final_bin': 5,
-            'step_start': 0,
-            'step_end': 20,
+            'general': {
+                'step_start': 0,
+                'step_end': 20,
+            },
+            
+            'setup': {
+                'use_rawtlt': True,
+                'pixel_size': 0.163,
+                'rot_angle': 86.,
+                'gold_size': 0.,
+                'adoc_template': '/opt/modules/imod/4.11.1/IMOD/SystemTemplate/cryoSample.adoc',
+            },
+
+            'preprocessing': {
+                'delete_old_files': False,
+                'remove_xrays': True,
+            },
+
+            'coarse_align': {
+                'bin_factor': 8,
+            },
+
+            'patch_track': {
+                'size_of_patches': [300, 200],
+                'num_of_patches': [12, 8],
+                'num_iterations': 4,
+                'limits_on_shift': [2, 2],
+                'adjust_tilt_angles': True,
+            },
+
+            'fine_align': {
+                'num_surfaces': 1,
+                'mag_option': 'fixed',
+                'tilt_option': 'fixed',
+                'rot_option': 'group',
+                'beam_tilt_option': 'fixed',
+                'use_robust_fitting': True,
+                'weight_all_contours': True,
+            },
+
+            'positioning': {
+                'do_positioning': False,
+                'unbinned_thickness': 3600,
+            },
+
+            'aligned_stack': {
+                'correct_ctf': False,
+                'erase_gold': False,
+                '2d_filtering': False,
+                'bin_factor': 8,
+            },
+
+            'reconstruction': {
+                'thickness': 3600,
+            },
+
+            'postprocessing': {
+                'run_trimvol': True,
+                'trimvol_reorient': 'rotate',
+            },
         }
     }
 

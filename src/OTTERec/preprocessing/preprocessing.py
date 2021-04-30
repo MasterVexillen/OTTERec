@@ -66,7 +66,7 @@ def preprocessing(paramsObj, loggerObj):
         if params['CTFFind']['run_ctffind']:
             wObj.new_async(ctf.CTFfind, args)
         if params['Run']['create_stack'] or \
-           params['BatchRunTomo']['align_image_brt']:
+           params['BatchRunTomo']['general']['align_image_brt']:
             wObj.new_async(stacks.Stack, args)
 
     # wrap everything up
