@@ -166,7 +166,6 @@ class Batchruntomo:
             for param in list(convert_dict.keys()):
                 adoc_file = adoc_file.replace(f'<{param}>', f'{convert_dict[param]}')
 
-            print(adoc_file)
             with open(self.filename_adoc, 'w') as file:
                 file.write(adoc_file)
         else:
