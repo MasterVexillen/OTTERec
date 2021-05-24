@@ -11,6 +11,7 @@ import os
 import sys
 import struct
 import yaml
+import math
 from glob import glob
 import pandas as pd
 import multiprocess as mp
@@ -374,6 +375,8 @@ def generate_yaml(filename):
 
         'BatchRunTomo': {
             'general': {
+                'align_images_brt': True,
+                'adoc_file': 'default',
                 'step_start': 0,
                 'step_end': 20,
             },
