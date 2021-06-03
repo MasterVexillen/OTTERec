@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-06-03T21:36:57.390Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36" etag="D8MAzM3QpBKNvgm0QIHA" version="14.7.4" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2021-06-03T21:39:57.581Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36" etag="k_ZulUbU2NLtxn0TBa5y" version="14.7.4" type="github" pages="2">
   <diagram id="b2UX4GlEIh6qMCerJ4nt" name="OTTERec / tomoDLS">
     <mxGraphModel dx="1874" dy="1932" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
@@ -286,7 +286,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="GgjASAZ1AlctklzeVHXa" name="OTTERec2">
-    <mxGraphModel dx="5688" dy="4292" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="3555" dy="3095" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="s87ekahSDVwL-AXoMf6T-0" />
         <mxCell id="s87ekahSDVwL-AXoMf6T-1" parent="s87ekahSDVwL-AXoMf6T-0" />
@@ -969,9 +969,6 @@
         </mxCell>
         <mxCell id="s87ekahSDVwL-AXoMf6T-231" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;fontFamily=Verdana;fontSize=20;fontColor=#000000;strokeWidth=10;fillColor=#1ba1e2;strokeColor=#006EAF;jumpSize=33;jumpStyle=arc;dashPattern=1 1;" parent="s87ekahSDVwL-AXoMf6T-1" source="s87ekahSDVwL-AXoMf6T-233" target="s87ekahSDVwL-AXoMf6T-234" edge="1">
           <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="qlygkCRCWRt0rYqdv92X-3" value="Text" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="s87ekahSDVwL-AXoMf6T-1">
-          <mxGeometry x="700" y="-290" width="40" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
