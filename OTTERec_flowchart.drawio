@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-06-03T18:47:58.151Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36" etag="guRNOLoSh6Xros7WVOl9" version="14.7.4" type="github" pages="2">
+<mxfile host="app.diagrams.net" modified="2021-06-03T18:53:06.285Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36" etag="PUmxilJtYsrBe0McYujh" version="14.7.4" type="github" pages="2">
   <diagram id="b2UX4GlEIh6qMCerJ4nt" name="OTTERec / tomoDLS">
     <mxGraphModel dx="1422" dy="1898" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="1" shadow="0">
       <root>
@@ -286,7 +286,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="GgjASAZ1AlctklzeVHXa" name="OTTERec2">
-    <mxGraphModel dx="2844" dy="2696" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1673" dy="2039" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="s87ekahSDVwL-AXoMf6T-0" />
         <mxCell id="s87ekahSDVwL-AXoMf6T-1" parent="s87ekahSDVwL-AXoMf6T-0" />
@@ -392,17 +392,17 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="755" y="430" as="targetPoint" />
             <Array as="points">
-              <mxPoint x="870" y="940" />
+              <mxPoint x="870" y="950" />
               <mxPoint x="870" y="590" />
               <mxPoint x="820" y="590" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="Y5SJRaH_rNokmWIUNs9c-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=arc;jumpSize=33;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontSize=20;strokeWidth=2;" edge="1" parent="s87ekahSDVwL-AXoMf6T-31" source="s87ekahSDVwL-AXoMf6T-98" target="s87ekahSDVwL-AXoMf6T-37">
+        <mxCell id="Y5SJRaH_rNokmWIUNs9c-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;jumpStyle=arc;jumpSize=33;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;fontSize=20;strokeWidth=2;" edge="1" parent="s87ekahSDVwL-AXoMf6T-31" source="s87ekahSDVwL-AXoMf6T-98" target="s87ekahSDVwL-AXoMf6T-37">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="s87ekahSDVwL-AXoMf6T-98" value="Update MC2 metadata" style="whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fontSize=13;fillColor=#d5e8d4;strokeColor=#82b366;" parent="s87ekahSDVwL-AXoMf6T-31" vertex="1">
-          <mxGeometry x="140" y="1010" width="160" height="40" as="geometry" />
+          <mxGeometry x="400" y="930" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="s87ekahSDVwL-AXoMf6T-17" value="Run&lt;b&gt;&amp;nbsp;MotionCor2&lt;/b&gt;&amp;nbsp;on chunks" style="whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;fontSize=13;fillColor=#d5e8d4;strokeColor=#82b366;" parent="s87ekahSDVwL-AXoMf6T-31" vertex="1">
           <mxGeometry x="390" y="720" width="180" height="40" as="geometry" />
